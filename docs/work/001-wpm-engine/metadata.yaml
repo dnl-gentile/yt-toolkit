@@ -1,0 +1,21 @@
+id: W-001
+slug: 001-wpm-engine
+title: "Extract timedtext + WPM + clock engine with load-bearing tests"
+tier: L
+tier_rationale: >
+  WPM/lock/trim math is the feature that has been wrong across v1.3–v1.5.24.
+  Path floor L (quality.md §3). No source may lower it.
+status: in-progress
+paths_owned:
+  - lib/timedtext.js
+  - lib/wpm.js
+  - lib/clock.js
+  - tests/timedtext.test.js
+  - tests/wpm.test.js
+  - tests/clock.test.js
+  - tests/fixtures/
+  - package.json
+  - docs/work/001-wpm-engine/
+notes: >
+  pace.js is rewired in a follow-up slice after this engine is green.
+  Do not edit content/pace.js in this item.

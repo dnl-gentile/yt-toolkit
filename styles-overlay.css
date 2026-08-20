@@ -1,0 +1,42 @@
+/* Top-center pace + time cluster. Must not cover YouTube's top-right info cards. */
+.qt-cluster-wrap {
+  top: 12px !important;
+  left: 50% !important;
+  right: auto !important;
+  transform: translateX(-50%) !important;
+  z-index: 45 !important;
+}
+#qt-speed-menu.qt-menu {
+  top: 56px !important;
+  left: 50% !important;
+  right: auto !important;
+  transform: translateX(-50%) !important;
+}
+.qt-cluster-label .qt-orig-time {
+  color: rgb(255 255 255 / 0.72);
+  font-weight: 400;
+}
+
+/* Native YouTube clock stays native — we no longer hide it. */
+.ytp-time-display.qt-time-native-hide {
+  display: inline-flex !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  padding: unset !important;
+  margin: unset !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  overflow: visible !important;
+}
+#qt-time-pill {
+  display: none !important;
+}
+
+/* Dual lines: native-like stack, not glued. */
+#movie_player .qt-cap-s {
+  bottom: 136px !important;
+}
+#movie_player .qt-cap-s.qt-rsvp {
+  bottom: 156px !important;
+}

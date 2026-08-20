@@ -1,0 +1,15 @@
+{
+  "name": "yt-toolkit",
+  "private": true,
+  "version": "1.6.1",
+  "description": "YouTube Toolkit Chrome extension",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "test:integration": "node --test tests/integration/*.test.js",
+    "test:visual": "playwright test --project=visual",
+    "test:live": "playwright test tests/live/probe.spec.js --project=chromium"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.1"
+  }
+}

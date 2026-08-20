@@ -1,0 +1,17 @@
+{
+  "moviePlayer": "#movie_player",
+  "qtCluster": "#qt-cluster",
+  "settingsMenu": ".ytp-settings-menu",
+  "settingsMenuItems": ".ytp-settings-menu .ytp-menuitem",
+  "settingsButton": ".ytp-settings-button",
+  "panelTitle": ".ytp-panel-title",
+  "menuitemToggleCheckbox": ".ytp-menuitem-toggle-checkbox",
+  "captionWindow": ".caption-window",
+  "captionSegment": ".ytp-caption-segment",
+  "guideButton": "#guide-button",
+  "avatar": "#avatar-btn",
+  "timeCurrent": ".ytp-time-current",
+  "timeDuration": ".ytp-time-duration",
+  "timedtextPath": "/api/timedtext",
+  "navigateFinishEvent": "yt-navigate-finish"
+}

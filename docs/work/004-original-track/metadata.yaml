@@ -1,0 +1,17 @@
+id: W-004
+slug: 004-original-track
+title: "Always fetch original ASR timedtext; post translations as original:false"
+tier: L
+tier_rationale: >
+  WPM / lock / trim / clock consume this payload (SPEC 1.6.1). A non-tlang
+  translation in QT.cues makes CJK look like silence and holds 4×/8× through
+  speech. Path floor L.
+status: implemented
+paths_owned:
+  - content/inject.js
+  - docs/work/004-original-track/
+notes: >
+  Identify the asr captionTrack once per video (else first track). Fetch that
+  URL as json3 with tlang stripped. lastTimedOriginal is only written when
+  original === true. QT_NEED_TRACKS re-posts lastTimedOriginal first.
+  Do not edit pace.js, captions.js, styles, or content_script_youtube.js.

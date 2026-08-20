@@ -1,0 +1,69 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube Toolkit",
+  "short_name": "yt-toolkit",
+  "version": "1.6.1",
+  "description": "YouTube Toolkit: No Distractions, constant WPM pace, dual captions and word highlight.",
+  "permissions": ["storage", "webNavigation"],
+  "host_permissions": [
+    "https://www.youtube.com/*",
+    "https://yt-search-bar.web.app/*",
+    "https://www.google-analytics.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.youtube.com/*"],
+      "js": ["content/inject.js"],
+      "world": "MAIN",
+      "run_at": "document_start"
+    },
+    {
+      "matches": ["https://www.youtube.com/*"],
+      "js": [
+        "lib/timedtext.js",
+        "lib/wpm.js",
+        "lib/clock.js",
+        "lib/dual-lang.js",
+        "content_script_youtube.js",
+        "content/yt-menu-patch.js",
+        "content/pace.js",
+        "content/captions.js"
+      ],
+      "css": ["styles.css", "styles-overlay.css", "styles-toggles.css"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://yt-search-bar.web.app/*"],
+      "js": ["content_script_searchapp.js"],
+      "css": ["styles.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "icons/quiet_mode_on.png",
+        "icons/quiet_mode_off.png",
+        "icons/quiet_mode_on_black.png",
+        "icons/quiet_mode_off_black.png"
+      ],
+      "matches": ["https://www.youtube.com/*", "https://yt-search-bar.web.app/*"]
+    }
+  ],
+  "action": {
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    },
+    "default_title": "YouTube Toolkit"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

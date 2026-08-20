@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>yt-toolkit chrome fixture</title>
+  <link rel="stylesheet" href="../../../styles.css" />
+  <link rel="stylesheet" href="../../../styles-overlay.css" />
+  <link rel="stylesheet" href="../../../styles-toggles.css" />
+  <style>
+    body { margin: 0; background: #111; font-family: Roboto, Arial, sans-serif; }
+    .stage { position: relative; width: 960px; height: 540px; background: #333; }
+    #qt-cluster { position: absolute; }
+    #qt-speed-menu { position: absolute; display: block; }
+  </style>
+</head>
+<body>
+  <div class="stage" id="movie_player">
+    <div id="qt-cluster" class="qt-cluster-wrap">
+      <div class="qt-chrome-cluster">
+        <span class="qt-cluster-label">6:35 / 6:35 <span class="qt-orig-time">(13:09)</span>   ·   180 WPM  ·  2x</span>
+        <div class="qt-chrome-btn" aria-label="Playback speed"></div>
+      </div>
+    </div>
+    <div id="qt-speed-menu" class="qt-menu">
+      <div class="qt-row" data-toggle="paceLock">
+        <span class="qt-row-label">Pace lock</span>
+        <div class="qt-switch on" aria-checked="true"></div>
+      </div>
+      <div class="qt-row" data-toggle="trimSilence">
+        <span class="qt-row-label">Trim silence</span>
+        <div class="qt-switch on" aria-checked="true"></div>
+      </div>
+      <div class="qt-row">
+        <span class="qt-row-label">Off row</span>
+        <div class="qt-switch" aria-checked="false"></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

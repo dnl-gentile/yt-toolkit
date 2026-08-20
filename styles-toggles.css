@@ -1,0 +1,118 @@
+/* W-006: native YouTube toggle paint. Beats .ytp-menuitem-toggle-checkbox. */
+
+.qt-switch,
+.ytp-menuitem-toggle-checkbox.qt-switch {
+  display: inline-block !important;
+  position: relative !important;
+  right: auto !important;
+  left: auto !important;
+  width: 36px !important;
+  height: 14px !important;
+  border: 0 !important;
+  outline: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 8px !important;
+  background: rgba(255, 255, 255, 0.15) !important; /* off track */
+  cursor: pointer;
+  flex-shrink: 0;
+  box-shadow: none !important;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* YouTube paints the track on ::before; keep it in lockstep with our fill. */
+.qt-switch::before,
+.ytp-menuitem-toggle-checkbox.qt-switch::before {
+  background: rgba(255, 255, 255, 0.15) !important;
+}
+
+.qt-switch::after {
+  content: "" !important;
+  position: absolute !important;
+  width: 20px !important;
+  height: 20px !important;
+  top: -3px !important;
+  left: -3px !important;
+  border-radius: 50% !important;
+  background: #c8c8c8 !important; /* off thumb */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  transform: none !important;
+}
+
+.qt-switch.on,
+.ytp-menuitem[aria-checked="true"] .qt-switch,
+.ytp-menuitem-toggle-checkbox.qt-switch.on {
+  background: rgba(255, 255, 255, 0.55) !important; /* on track — visibly lighter */
+}
+
+.qt-switch.on::before,
+.ytp-menuitem[aria-checked="true"] .qt-switch::before,
+.ytp-menuitem-toggle-checkbox.qt-switch.on::before {
+  background: rgba(255, 255, 255, 0.55) !important;
+}
+
+.qt-switch.on::after,
+.ytp-menuitem[aria-checked="true"] .qt-switch::after,
+.ytp-menuitem-toggle-checkbox.qt-switch.on::after {
+  background: #ffffff !important; /* on thumb white */
+  left: -3px !important;
+  transform: translateX(22px) !important;
+}
+
+.qt-switch:focus,
+.qt-switch:focus-visible,
+.ytp-menuitem-toggle-checkbox.qt-switch:focus,
+.ytp-menuitem-toggle-checkbox.qt-switch:focus-visible,
+.qt-chrome-btn:focus,
+.qt-chrome-btn:focus-visible,
+.qt-chrome-btn:active,
+.ytp-probably-keyboard-focus .qt-switch,
+.ytp-probably-keyboard-focus .qt-chrome-btn,
+.ytp-probably-keyboard-focus .ytp-menuitem.qt-cap-toggle:focus .ytp-menuitem-icon {
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+  border: 0 !important;
+}
+
+/* Dual / Color / Center: same left-label + native icon column as Off. */
+.ytp-popup.ytp-settings-menu .ytp-menuitem.qt-cap-toggle,
+.ytp-settings-menu .ytp-menuitem.qt-cap-toggle,
+.ytp-menuitem.qt-cap-toggle {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+}
+
+.ytp-popup.ytp-settings-menu .ytp-menuitem.qt-cap-toggle .ytp-menuitem-icon,
+.ytp-settings-menu .ytp-menuitem.qt-cap-toggle .ytp-menuitem-icon,
+.ytp-menuitem.qt-cap-toggle .ytp-menuitem-icon {
+  width: 40px !important;
+  min-width: 24px !important;
+  max-width: 40px !important;
+  flex: 0 0 40px !important;
+  box-sizing: border-box !important;
+}
+
+.ytp-popup.ytp-settings-menu .ytp-menuitem.qt-cap-toggle .ytp-menuitem-label,
+.ytp-settings-menu .ytp-menuitem.qt-cap-toggle .ytp-menuitem-label,
+.ytp-menuitem.qt-cap-toggle .ytp-menuitem-label {
+  text-align: left !important;
+  justify-content: flex-start !important;
+  margin-left: 0 !important;
+  margin-right: auto !important;
+  flex: 1 1 auto !important;
+  white-space: nowrap !important;
+}
+
+.ytp-popup.ytp-settings-menu .ytp-menuitem.qt-cap-toggle .ytp-menuitem-content,
+.ytp-settings-menu .ytp-menuitem.qt-cap-toggle .ytp-menuitem-content,
+.ytp-menuitem.qt-cap-toggle .ytp-menuitem-content {
+  margin-left: auto !important;
+  text-align: right !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  flex: 0 0 auto !important;
+}

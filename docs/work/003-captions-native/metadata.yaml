@@ -1,0 +1,15 @@
+id: W-003
+slug: 003-captions-native
+title: "Dual / highlight / center + native Subtitles/CC toggles"
+tier: M
+tier_rationale: >
+  User-visible captions and menu injection. Independent review of the diff.
+status: implemented
+paths_owned:
+  - content/captions.js
+  - content/yt-menu-patch.js
+  - styles.css
+  - docs/work/003-captions-native/
+notes: >
+  Cue format is { start, end, text, words: [{ w, t }] } from lib/timedtext.js
+  via window.QuietTube.cues / cuesByLang. Do not reparse timedtext here.

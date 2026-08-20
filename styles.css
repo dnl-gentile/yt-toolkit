@@ -1,0 +1,715 @@
+/* Style for the button on YouTube's navbar */
+.yt-quiet-mode-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px; /* Standard YouTube icon padding */
+  margin: 0 -4px; /* Negative margin to reduce spacing */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  transition: background-color 0.2s ease;
+  position: relative;
+}
+
+/* Circular hover background - matches YouTube's notification button */
+/* Use more specific selectors and ensure it works on dark theme */
+.yt-quiet-mode-button:hover {
+  background-color: rgba(255, 255, 255, 0.18) !important;
+}
+
+/* Dark theme hover - lighter to match YouTube's notification button */
+html[dark] .yt-quiet-mode-button:hover,
+body[dark] .yt-quiet-mode-button:hover,
+html[dark] #quiet-mode-toggle-button:hover,
+body[dark] #quiet-mode-toggle-button:hover,
+[dark] .yt-quiet-mode-button:hover,
+ytd-masthead[dark] .yt-quiet-mode-button:hover,
+ytd-masthead[dark] #quiet-mode-toggle-button:hover {
+  background-color: rgba(255, 255, 255, 0.18) !important;
+}
+
+/* Light theme hover - darker/more opaque (but not on video pages where navbar is dark) */
+html:not([dark]) .yt-quiet-mode-button:hover,
+body:not([dark]) .yt-quiet-mode-button:hover,
+html:not([dark]) #quiet-mode-toggle-button:hover,
+body:not([dark]) #quiet-mode-toggle-button:hover {
+  background-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Video pages have dark navbar even in light theme - use light hover circle */
+ytd-masthead[dark] .yt-quiet-mode-button:hover,
+ytd-masthead[dark] #quiet-mode-toggle-button:hover {
+  background-color: rgba(255, 255, 255, 0.18) !important;
+}
+
+/* Light theme home/search pages - darker hover circle */
+html:not([dark]) ytd-masthead:not([dark]) .yt-quiet-mode-button:hover,
+html:not([dark]) ytd-masthead:not([dark]) #quiet-mode-toggle-button:hover {
+  background-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Active/pressed state */
+.yt-quiet-mode-button:active {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+html:not([dark]) .yt-quiet-mode-button:active,
+body:not([dark]) .yt-quiet-mode-button:active {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+
+.yt-quiet-mode-button img {
+  width: 24px;
+  height: 24px;
+}
+
+.qt-toolkit-ico {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+
+#movie_player .qt-orig-time {
+  color: rgb(255 255 255 / 0.72);
+  font-weight: 400;
+  background: none !important;
+}
+#qt-time,
+#qt-time-cur,
+#qt-time-dur,
+#qt-time-ov {
+  display: none !important;
+}
+.ytp-time-display.qt-time-native-hide {
+  display: none !important;
+  width: 0 !important;
+  min-width: 0 !important;
+  max-width: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+#qt-time-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  flex: 0 0 auto !important;
+  height: 40px;
+  padding: 0 12px !important;
+  margin: 0 0 0 4px !important;
+  border-radius: 20px !important;
+  background: rgba(15, 15, 15, 0.75) !important;
+  color: #fff !important;
+  font-size: 13px !important;
+  font-family: Roboto, Arial, sans-serif !important;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap !important;
+  box-sizing: border-box !important;
+  line-height: 40px;
+  overflow: visible !important;
+  width: auto !important;
+  max-width: none !important;
+}
+
+.html5-video-player.qt-ours-on .ytp-caption-window-container,
+.html5-video-player.qt-ours-on .caption-window,
+.html5-video-player.qt-ours-on .ytp-caption-window-bottom {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.ytp-popup.ytp-settings-menu .ytp-menuitem.qt-cap-toggle,
+.ytp-settings-menu .ytp-menuitem.qt-cap-toggle {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  width: 100% !important;
+  max-width: none !important;
+  box-sizing: border-box !important;
+  border-radius: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.ytp-popup.ytp-settings-menu .ytp-menuitem.qt-cap-toggle:hover,
+.ytp-settings-menu .ytp-menuitem.qt-cap-toggle:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-radius: 0 !important;
+}
+.ytp-menuitem.qt-cap-toggle,
+.ytp-menuitem.qt-cap-toggle:focus,
+.ytp-menuitem.qt-cap-toggle:focus-visible,
+.ytp-menuitem.qt-cap-toggle:focus-within,
+.qt-switch,
+.qt-switch:focus,
+.qt-switch:focus-visible,
+#qt-speed-menu:focus,
+#qt-speed-menu:focus-visible {
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  -webkit-tap-highlight-color: transparent;
+}
+.ytp-menuitem.qt-cap-toggle .ytp-menuitem-label {
+  white-space: nowrap !important;
+  text-align: left !important;
+  flex: 1 1 auto !important;
+  justify-content: flex-start !important;
+}
+.ytp-menuitem.qt-cap-toggle .ytp-menuitem-content {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-left: auto;
+}
+.ytp-menuitem.qt-cap-toggle *:focus,
+.ytp-menuitem.qt-cap-toggle *:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Custom YouTube-style tooltip */
+.yt-quiet-mode-tooltip {
+  position: absolute;
+  bottom: -55px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+  background-color: rgba(85, 85, 85, 0.92);
+  color: #ffffff;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 400;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.1s ease, transform 0.1s ease, visibility 0s linear 0.1s;
+  font-family: "Roboto", "Arial", sans-serif;
+  line-height: 1.4;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Tooltip theme - same color for both dark and light themes */
+html[dark] .yt-quiet-mode-tooltip,
+body[dark] .yt-quiet-mode-tooltip,
+[dark] .yt-quiet-mode-tooltip,
+html:not([dark]) .yt-quiet-mode-tooltip,
+body:not([dark]) .yt-quiet-mode-tooltip {
+  background-color: rgba(85, 85, 85, 0.92);
+  color: #ffffff;
+}
+
+/* Show tooltip on hover */
+.yt-quiet-mode-tooltip.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+  transition: opacity 0.1s ease, transform 0.1s ease, visibility 0s linear 0s;
+}
+
+/* Style for the button on the search-app page */
+.search-app-quiet-mode-button {
+  position: fixed !important;
+  top: 16px !important;
+  right: 16px !important;
+  z-index: 9999 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  width: 40px !important;
+  height: 40px !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: background-color 0.2s ease !important;
+  padding: 8px !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+  border-radius: 50% !important;
+  outline: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Circular hover background on search app - must override base transparent background */
+.search-app-quiet-mode-button:hover,
+#quiet-mode-toggle-button:hover {
+  background-color: rgba(0, 0, 0, 0.1) !important;
+  background: rgba(0, 0, 0, 0.1) !important;
+  opacity: 1 !important;
+}
+
+/* Tooltip on search app - positioned below button, adjusted to stay on screen */
+.search-app-quiet-mode-button .yt-quiet-mode-tooltip {
+  position: absolute;
+  top: 100% !important;
+  bottom: auto !important;
+  left: 50% !important;
+  right: auto !important;
+  margin-top: 8px;
+  transform: translateX(-50%) translateY(-4px);
+  background-color: rgba(85, 85, 85, 0.92);
+  color: #ffffff;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 400;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10001;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.1s ease, transform 0.1s ease, visibility 0s linear 0.1s;
+  font-family: "Roboto", "Arial", sans-serif;
+  line-height: 1.4;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.search-app-quiet-mode-button .yt-quiet-mode-tooltip.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+  transition: opacity 0.1s ease, transform 0.1s ease, visibility 0s linear 0s;
+}
+
+.search-app-quiet-mode-button:focus {
+  outline: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.search-app-quiet-mode-button img {
+  width: 24px !important;
+  height: 24px !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border-radius: 0 !important;
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Fix YouTube icon glow to white instead of blue */
+ytd-toggle-button-renderer button:focus,
+ytd-toggle-button-renderer button:active,
+#top-level-buttons-computed button:focus,
+#top-level-buttons-computed button:active {
+  outline: 2px solid rgba(255, 255, 255, 0.5) !important;
+  outline-offset: 2px !important;
+}
+
+ytd-toggle-button-renderer button:focus-visible,
+#top-level-buttons-computed button:focus-visible {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Let YouTube's natural layout handle metadata sizing when sidebar is hidden */
+/* The expandPrimaryColumn() function already handles proper expansion */
+
+/* Ensure search autocomplete dropdown is always visible */
+/* These are the suggestions that appear when typing in the search box */
+ytd-searchbox,
+ytd-searchbox-spt,
+#searchbox,
+#searchbox-spt,
+ytd-searchbox-spt #container,
+ytd-searchbox-spt ytd-searchbox-renderer,
+ytd-searchbox-spt #suggestions,
+ytd-searchbox-spt ytd-searchbox-renderer #suggestions,
+ytd-searchbox-spt #suggestions-container,
+ytd-searchbox-spt .suggestions,
+ytd-searchbox-spt ytd-searchbox-renderer #suggestions,
+#searchbox-spt #suggestions,
+#searchbox-spt .suggestions {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  z-index: 9999 !important;
+}
+
+/* Ensure search suggestion items are visible */
+ytd-searchbox-spt ytd-searchbox-renderer #suggestions ytd-simplebox-renderer,
+ytd-searchbox-spt ytd-searchbox-renderer #suggestions ytd-simplebox-renderer a,
+ytd-searchbox-spt ytd-searchbox-renderer #suggestions ytd-simplebox-renderer ytd-searchbox-renderer,
+#searchbox-spt #suggestions ytd-simplebox-renderer,
+#searchbox-spt #suggestions ytd-simplebox-renderer a {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+/* ——— YouTube Toolkit overlay / captions ——— */
+.qt-cluster-wrap {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 60;
+  width: max-content;
+  height: max-content;
+  pointer-events: auto;
+  transition: opacity 0.2s;
+}
+.qt-cluster-wrap.qt-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+.qt-chrome-cluster {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  box-sizing: border-box;
+  height: 40px;
+  width: max-content;
+  padding: 2px 2px 2px 14px;
+  gap: 0;
+  overflow: hidden;
+  background: rgba(15, 15, 15, 0.75);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: 0;
+  box-shadow: none;
+  border-radius: 999px;
+  color: #fff;
+  font-family: Roboto, Arial, sans-serif;
+}
+.qt-cluster-label {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 36px;
+  padding: 0 8px 0 2px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.qt-chrome-btn {
+  box-sizing: border-box;
+  display: grid !important;
+  place-items: center;
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  min-height: 36px !important;
+  max-width: 36px !important;
+  max-height: 36px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  border-radius: 999px !important;
+  flex: 0 0 36px;
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-tap-highlight-color: transparent;
+}
+#qt-cluster .qt-chrome-btn:focus,
+#qt-cluster .qt-chrome-btn:focus-visible,
+#qt-cluster .qt-chrome-btn:active,
+#qt-cluster .qt-chrome-btn.is-on,
+#qt-cluster .qt-chrome-btn:hover,
+.qt-chrome-btn:focus,
+.qt-chrome-btn:focus-visible,
+.qt-chrome-btn:active,
+.qt-chrome-btn.is-on,
+.qt-chrome-btn:hover {
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+}
+.qt-chrome-btn.is-on,
+.qt-chrome-btn:hover {
+  background: rgb(255 255 255 / 0.1);
+  border-radius: 999px !important;
+}
+.qt-chrome-btn .qt-ico,
+.qt-ico {
+  width: 24px !important;
+  height: 24px !important;
+  display: block;
+}
+.qt-menu,
+#qt-speed-menu {
+  position: absolute;
+  top: 68px;
+  right: 12px;
+  z-index: 70;
+  width: 340px;
+  background: rgba(15, 15, 15, 0.82);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: 0;
+  outline: none;
+  box-shadow: none;
+  border-radius: 12px;
+  color: #fff;
+  font-family: Roboto, Arial, sans-serif;
+  overflow: hidden;
+  padding: 8px 0 12px;
+}
+.qt-menu-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px 4px;
+  font-size: 14px;
+  font-weight: 500;
+}
+.qt-menu-head .qt-ico { width: 20px; height: 20px; }
+.qt-menu-sub {
+  margin: 0;
+  padding: 0 16px 10px;
+  font-size: 12px;
+  color: rgb(255 255 255 / 0.5);
+}
+.qt-rule {
+  height: 1px;
+  margin: 4px 12px;
+  background: rgb(255 255 255 / 0.1);
+}
+.qt-big {
+  margin: 0;
+  padding: 12px 16px 8px;
+  text-align: center;
+  font-size: 28px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.qt-big span {
+  font-size: 15px;
+  font-weight: 400;
+  color: rgb(255 255 255 / 0.55);
+}
+.qt-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px 10px;
+}
+.qt-slider-row input[type="range"] {
+  flex: 1;
+  accent-color: #fff;
+}
+.qt-circle {
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.1);
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+}
+.qt-pills {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 12px 4px;
+  flex-wrap: wrap;
+}
+.qt-pill {
+  min-width: 48px;
+  border: 0;
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: rgb(255 255 255 / 0.1);
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+}
+.qt-pill.sel {
+  background: #fff;
+  color: #0f0f0f;
+}
+.qt-hint {
+  margin: 0;
+  padding: 0 22px 10px;
+  font-size: 11px;
+  color: rgb(255 255 255 / 0.45);
+}
+.qt-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 48px;
+  padding: 0 14px;
+  cursor: pointer;
+}
+.qt-row:hover { background: rgb(255 255 255 / 0.08); }
+.qt-row-ico { width: 24px; color: #fff; }
+.qt-row-label { flex: 1; font-size: 14px; }
+.qt-switch,
+.ytp-menuitem-toggle-checkbox.qt-switch {
+  display: inline-block;
+  width: 36px;
+  height: 14px;
+  border: 0 !important;
+  outline: none !important;
+  padding: 0;
+  margin: 0;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.18);
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: none !important;
+}
+.qt-switch::after {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #f1f1f1;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  transition: transform 0.1s, background-color 0.1s;
+  transform: none;
+}
+.qt-switch.on,
+.ytp-menuitem[aria-checked="true"] .qt-switch {
+  background: rgba(255, 255, 255, 0.42);
+}
+.qt-switch.on::after,
+.ytp-menuitem[aria-checked="true"] .qt-switch::after {
+  background: #f1f1f1;
+  transform: translateX(22px);
+}
+.qt-kicker {
+  margin: 0;
+  padding: 6px 14px 4px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.45);
+}
+.qt-cap-line {
+  position: absolute;
+  left: 50%;
+  width: min(92%, 720px);
+  transform: translateX(-50%);
+  z-index: 50;
+  cursor: grab;
+  pointer-events: auto;
+  text-align: center;
+  font-family: "YouTube Noto", Roboto, Arial, Helvetica, sans-serif;
+  font-size: clamp(22px, 4.2vh, 40px);
+  font-weight: 400;
+  line-height: 1.35;
+  color: #fff;
+}
+.qt-w,
+.qt-w-on,
+.qt-orp {
+  font-weight: 400;
+}
+.qt-cap-p { bottom: 72px; }
+.qt-cap-s { bottom: 118px; }
+.qt-caption {
+  display: inline-block;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 400;
+  line-height: inherit;
+  color: #fff;
+  margin: 0;
+}
+.qt-cap-bg {
+  background: rgb(8 8 8 / 0.75);
+  border-radius: 4px;
+  padding: 3px 10px;
+}
+.qt-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+.qt-cap-line.qt-rsvp {
+  left: 50% !important;
+  right: auto !important;
+  width: 28% !important;
+  max-width: 300px !important;
+  min-width: 180px !important;
+  transform: translateX(-50%);
+  bottom: 78px;
+  z-index: 51;
+}
+.qt-cap-s.qt-rsvp { bottom: 128px; }
+.qt-rsvp-stage {
+  position: relative;
+  width: 100%;
+  min-height: 2.2em;
+  padding: 8px 6px 9px;
+  overflow: hidden;
+  background: rgb(8 8 8 / 0.78);
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+.qt-rsvp-track {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0.38em;
+  white-space: nowrap;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: inherit;
+  font-weight: 400;
+  color: #fff;
+  transform: translateX(0);
+  margin-top: -0.7em;
+  will-change: transform;
+}
+.qt-rsvp-track .qt-w { flex: 0 0 auto; }
+.qt-rsvp-hair {
+  position: absolute;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  transform: translateX(-50%);
+  z-index: 2;
+  pointer-events: none;
+}
+.qt-rsvp-hair.top {
+  top: 2px;
+  border-top: 7px solid #ff3b3b;
+}
+.qt-rsvp-hair.bot {
+  bottom: 2px;
+  border-bottom: 7px solid #ff3b3b;
+}
+.qt-lang-check {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+}
+.qt-orp { color: inherit; }

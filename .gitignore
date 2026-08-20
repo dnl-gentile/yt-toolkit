@@ -1,0 +1,7 @@
+node_modules/
+output/
+playwright-report/
+test-results/
+blob-report/
+.DS_Store
+*.zip

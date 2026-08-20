@@ -1,0 +1,15 @@
+id: W-006
+slug: 006-toggle-paint
+title: "Native on/off toggle paint + Dual/Color/Center row alignment"
+tier: M
+tier_rationale: >
+  User-visible menu UI (pace lock / trim / Dual / Color / Center toggles).
+  Quality.md §3 path M — independent review of the diff.
+status: implemented
+paths_owned:
+  - styles-toggles.css
+  - docs/work/006-toggle-paint/
+notes: >
+  Do not edit styles.css (W-003). Manifest content_scripts.css append of
+  styles-toggles.css is a coordinator follow-up — this file is the override
+  payload so YouTube's .ytp-menuitem-toggle-checkbox cannot win.

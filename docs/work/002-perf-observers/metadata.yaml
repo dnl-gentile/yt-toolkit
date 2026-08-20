@@ -1,0 +1,14 @@
+id: W-002
+slug: 002-perf-observers
+title: "Remove body-wide observers that freeze YouTube and home navigation"
+tier: L
+tier_rationale: >
+  Tab freezes and logo/home hangs are host-integrity failures. Quality.md
+  performance budget is an invariant.
+status: implemented
+paths_owned:
+  - content_script_youtube.js
+  - docs/work/002-perf-observers/
+notes: >
+  Do not touch pace.js, captions.js, or styles.css.
+  Real-host verification still pending; grep evidence in EVIDENCE.md.

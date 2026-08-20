@@ -1,0 +1,20 @@
+id: W-005
+slug: 005-live-harness
+title: "Playwright live harness that loads the unpacked extension against real YouTube"
+tier: M
+tier_rationale: >
+  Live / real-host probe (quality.md §2). Host selectors and extension load;
+  screenshot or live probe when the layout changes. A green YouTube run is
+  not required in this slice if network/login/consent blocks the agent.
+status: done
+paths_owned:
+  - tests/live/
+  - tests/host/
+  - tests/fixtures/.gitkeep
+  - docs/work/005-live-harness/
+  - playwright.config.js
+notes: >
+  package.json is merge-only: @playwright/test + scripts.test:live.
+  The unit script "test" stays "node --test tests/*.test.js" (W-001).
+  Points at docs/QUALITY.md §2 live, docs/YOUTUBE-MONITOR.md §1–2,
+  docs/SPEC.md §10. Do not edit content/, lib/, styles.css, content_script_*.js.
