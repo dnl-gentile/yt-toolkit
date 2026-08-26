@@ -140,6 +140,11 @@ refuses to build if `manifest.json` and `package.json` disagree on the version.
 
 ## Editing this wiki
 
+Images referenced by wiki pages live in `docs/media/` and are copied flat into the wiki
+root at publish time, so a page references one as `<img src="options.png">` — a relative
+name, not a `raw.githubusercontent.com/main` URL that renders broken until the branch
+merges.
+
 **Do not edit pages in the GitHub wiki UI.** The sources live in
 [`docs/wiki/`](https://github.com/dnl-gentile/yt-toolkit/tree/main/docs/wiki) and are
 published with:

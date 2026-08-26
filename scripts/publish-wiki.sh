@@ -15,6 +15,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 SRC="docs/wiki"
+IMG="docs/media"
 WIKI_URL="${WIKI_URL:-https://github.com/dnl-gentile/yt-toolkit.wiki.git}"
 WORK=".wiki-publish"
 
@@ -42,9 +43,16 @@ MSG
   exit 1
 fi
 
-# Wipe the tracked pages, then copy ours. Removals in docs/wiki/ propagate.
-( cd "$WORK" && git rm -rq --ignore-unmatch '*.md' )
+# Wipe tracked pages and images, then copy ours. Removals in the source propagate.
+( cd "$WORK" && git rm -rq --ignore-unmatch '*.md' '*.png' )
 cp "$SRC"/*.md "$WORK/"
+
+# Images live in docs/media/ (one source of truth, shared with the README) and are
+# copied flat into the wiki root, so pages can reference them relatively. A wiki that
+# depends on raw.githubusercontent.com/main renders broken until the branch is merged.
+if ls "$IMG"/*.png >/dev/null 2>&1; then
+  cp "$IMG"/*.png "$WORK/"
+fi
 
 cd "$WORK"
 git add -A

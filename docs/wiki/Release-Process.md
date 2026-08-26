@@ -51,10 +51,12 @@ Wiki sources live in `docs/wiki/`, versioned with the code, reviewed like the co
 npm run wiki:publish
 ```
 
-**One-time setup:** GitHub will not accept a push to a wiki that has never been
-initialised. Create any page once at
-`https://github.com/dnl-gentile/yt-toolkit/wiki` — the content does not matter, the
-publish overwrites it.
+The wiki is already initialised, so this just works. (GitHub refuses a push to a wiki that
+has never had a page; if that ever comes up on a fork, create one page in the web UI first
+— the content does not matter, the publish overwrites it.)
+
+Pages come from `docs/wiki/*.md`; images come from `docs/media/*.png`, copied flat into
+the wiki root so pages reference them by bare filename.
 
 Never edit pages in the wiki UI. The next publish overwrites them.
 

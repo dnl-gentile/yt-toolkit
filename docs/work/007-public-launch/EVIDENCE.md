@@ -129,3 +129,47 @@ it wrote `qt_telemetry: false` into `chrome.storage.sync`, which is the same key
 `pageerror` and console errors.
 
 Screenshot: `docs/media/options.png` (tier M, `QUALITY.md` §2 — a new visible surface).
+
+## 7. Wiki published
+
+The wiki had never been initialised, so `git push` to it was refused — GitHub has no API
+for creating the first page, and a bare `git init` + push fails the same way:
+
+```
+$ git push origin master
+remote: Repository not found.
+fatal: repository 'https://github.com/dnl-gentile/yt-toolkit.wiki.git/' not found
+```
+
+One page was created in the web UI to initialise the repository, after which the script
+overwrote it along with everything else:
+
+```
+$ npm run wiki:publish
+Publishing:
+  A	Architecture.md
+  A	Captions.md
+  A	Development.md
+  A	FAQ.md
+  M	Home.md
+  A	Installation.md
+  A	Keyboard-Shortcuts.md
+  A	No-Distractions.md
+  A	Pace-and-WPM.md
+  A	Privacy-and-Telemetry.md
+  A	Release-Process.md
+  A	Troubleshooting.md
+  A	_Footer.md
+  A	_Sidebar.md
+
+Published -> https://github.com/dnl-gentile/yt-toolkit/wiki
+```
+
+Rendering was checked in the browser: sidebar sections and links resolve, in-page anchors
+resolve, tables and code blocks render.
+
+The options-page screenshot was **broken** on first publish — it pointed at
+`raw.githubusercontent.com/.../main/docs/media/options.png`, and that file is on this
+branch, not yet on `main`. Fixed by making the wiki self-contained: `publish-wiki.sh` now
+copies `docs/media/*.png` into the wiki root and pages reference images by bare filename.
+Re-published and confirmed rendering.
