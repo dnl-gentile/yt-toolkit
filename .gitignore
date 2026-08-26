@@ -1,7 +1,11 @@
 node_modules/
 output/
+dist/
 playwright-report/
 test-results/
 blob-report/
 .DS_Store
 *.zip
+
+# Wiki working clone created by scripts/publish-wiki.sh
+.wiki-publish/

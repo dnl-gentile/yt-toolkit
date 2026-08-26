@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/dnl-gentile/yt-toolkit/security/advisories/new
+    about: Report privately. Do not open a public issue for a security problem.
+  - name: Question or idea
+    url: https://github.com/dnl-gentile/yt-toolkit/discussions
+    about: Ask how something works, or float an idea before it is a feature request.
+  - name: Wiki
+    url: https://github.com/dnl-gentile/yt-toolkit/wiki
+    about: Install guide, feature reference, troubleshooting, FAQ.

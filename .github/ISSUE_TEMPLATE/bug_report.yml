@@ -1,0 +1,89 @@
+name: Bug report
+description: Something behaves incorrectly.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        If YouTube's menus or markup appear to have changed under the extension — Dual in the
+        wrong panel, the native Playback speed row back, WPM stuck at 0 — use the **Host drift**
+        template instead. It asks for the right evidence.
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you saw, and what you expected instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open https://www.youtube.com/watch?v=...
+        2. Turn on Pace lock at 180 WPM
+        3. ...
+    validations:
+      required: true
+
+  - type: input
+    id: video
+    attributes:
+      label: Video URL
+      description: A public video where this reproduces. The pace engine needs captions, so this matters more than usual.
+      placeholder: https://www.youtube.com/watch?v=iG9CE55wbtY
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which part
+      options:
+        - Pace / WPM / playback rate
+        - Trim silence
+        - Watch-time clock
+        - Dual subtitles
+        - Color highlight / Center word
+        - No Distractions
+        - Options page / privacy switch
+        - Something else
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Extension version
+      description: chrome://extensions → YouTube Toolkit
+      placeholder: "1.6.1"
+    validations:
+      required: true
+
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and OS
+      placeholder: Chrome 141, macOS 15
+    validations:
+      required: true
+
+  - type: textarea
+    id: console
+    attributes:
+      label: Console errors
+      description: >
+        Open DevTools on the watch page (F12) → Console. Paste anything red. Also check the
+        service worker log at chrome://extensions → YouTube Toolkit → Details → Inspect views.
+      render: text
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: The video has captions of some kind (auto-generated counts)
+        - label: It still happens with every other extension disabled
+        - label: I searched existing issues
