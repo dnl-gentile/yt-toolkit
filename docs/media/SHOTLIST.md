@@ -47,7 +47,7 @@ is what sells the feature.
 - `no-distractions.png` — the same watch page with No Distractions on and off, side by
   side. Best as a single composed image.
 - `center-word.png` — the RSVP strip mid-word, with the red ORP hairs visible.
-- `options.png` — the options page, for the privacy section.
+- ~~`options.png`~~ — captured, in this folder.
 
 ## After capturing
 

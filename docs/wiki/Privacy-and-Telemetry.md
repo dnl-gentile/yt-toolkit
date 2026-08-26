@@ -34,6 +34,8 @@ complete list — there is no fifth event hiding somewhere.
 There is no analytics code in the content scripts at all. Telemetry lives only in the
 background service worker, which never sees page content.
 
+<img src="https://raw.githubusercontent.com/dnl-gentile/yt-toolkit/main/docs/media/options.png" width="620" alt="The options page: a Privacy card with the usage-statistics switch and an installation ID reset" />
+
 ## Turning it off
 
 1. `chrome://extensions`

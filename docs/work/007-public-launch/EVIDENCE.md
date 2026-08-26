@@ -101,3 +101,31 @@ options.css
 options.html
 options.js
 ```
+
+## 6. Real-host verification of the options page (QUALITY.md §1)
+
+Not a mock: Chromium launched with `--load-extension` pointed at the repo, the real
+service worker running, the options page opened at its `chrome-extension://` URL.
+
+```
+$ EXT="$(pwd)" node optcheck.mjs
+extension id: eeilpiaeeehlfmaibmffjalpghkcbajm
+title           : YouTube Toolkit — Options
+version shown   : 1.6.1
+checkbox exists : true
+checked default : true
+after click     : false
+status text     : "Usage statistics off. Nothing is sent."
+storage         : {"qt_telemetry":false}
+reset status    : "Installation ID reset."
+errors          : none
+```
+
+The line that matters is `storage`. The click did not merely flip a checkbox in the DOM —
+it wrote `qt_telemetry: false` into `chrome.storage.sync`, which is the same key
+`Analytics.isEnabled()` reads. The surface and the gate are connected.
+
+`checked default : true` confirms the documented default; `errors : none` covers both
+`pageerror` and console errors.
+
+Screenshot: `docs/media/options.png` (tier M, `QUALITY.md` §2 — a new visible surface).
