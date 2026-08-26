@@ -48,6 +48,7 @@ is what sells the feature.
   side. Best as a single composed image.
 - `center-word.png` — the RSVP strip mid-word, with the red ORP hairs visible.
 - ~~`options.png`~~ — captured, in this folder.
+- ~~`icons.png`~~ — captured: the card icon at 128, 48 and 16. Regenerate from `icons/src/icon.svg`, never by hand.
 
 ## After capturing
 

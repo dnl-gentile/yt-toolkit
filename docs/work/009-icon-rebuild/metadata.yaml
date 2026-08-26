@@ -1,0 +1,21 @@
+id: W-009
+slug: 009-icon-rebuild
+title: "Rebuild the card icon from vector; add a check that rejects a hand-edited PNG"
+tier: M
+tier_rationale: >
+  User-visible artwork, and the first thing anyone sees on the store card or in
+  the README. Quality.md §3 path M — screenshot evidence at every size.
+status: implemented
+paths_owned:
+  - icons/icon16.png
+  - icons/icon48.png
+  - icons/icon128.png
+  - icons/src/
+  - scripts/build-icons.mjs
+  - scripts/check-icons.mjs
+  - docs/work/009-icon-rebuild/
+notes: >
+  Touches package.json (two scripts), .github/workflows/ci.yml (one job),
+  scripts/package.sh (prune icons/src from the zip) and docs/SPEC.md §1.
+  Masthead icons (quiet_mode_*) are untouched — SPEC §1 keeps them as the
+  circle-with-slash.

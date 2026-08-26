@@ -19,7 +19,9 @@
     "test:visual": "playwright test --project=visual",
     "test:live": "playwright test tests/live/probe.spec.js --project=chromium",
     "package": "bash scripts/package.sh",
-    "wiki:publish": "bash scripts/publish-wiki.sh"
+    "wiki:publish": "bash scripts/publish-wiki.sh",
+    "icons": "node scripts/build-icons.mjs",
+    "icons:check": "node scripts/check-icons.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.62.1"

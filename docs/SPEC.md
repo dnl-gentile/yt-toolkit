@@ -27,7 +27,7 @@ Supersession 2026-08-20 (user session, prints on MrBeast *Last To Leave Mansion*
 - Store / card name: **YouTube Toolkit**
 - Folder / short name: `yt-toolkit`
 - Chrome MV3 unpacked extension, YouTube only (plus the quiet search app host)
-- Chrome card icon: red YouTube square + **white wrench** (Material `build`)
+- Chrome card icon: red YouTube square + **white wrench** (Material `build`). The source of truth is `icons/src/icon.svg`; the PNGs are rendered from it with `npm run icons` and must never be hand-edited. `npm run icons:check` fails if a PNG drifts from the vector, or if the glyph is too small to read at 16px — the size Chrome puts in the toolbar
 - Masthead No Distractions icon: original circle-with-slash, **not** the wrench
 
 ## 2. Non-goals

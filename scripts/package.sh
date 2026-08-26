@@ -48,6 +48,9 @@ for d in "${DIRS[@]}"; do
   cp -R "$d" "$STAGE/"
 done
 
+# Authoring sources are not part of the extension.
+rm -rf "$STAGE/icons/src"
+
 # Syntax-check every script that ships.
 while IFS= read -r js; do
   node --check "$js" || { echo "syntax error in $js" >&2; exit 1; }
