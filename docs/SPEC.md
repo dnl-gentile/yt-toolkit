@@ -4,6 +4,12 @@ Canonical. Later user decisions supersede earlier ones. Chat history is not a so
 
 Version of this document: **1.6.1** (2026-08-20). Extension semver in `manifest.json` tracks shipped behavior.
 
+Supersession 2026-08-26 (public repo launch):
+
+- The extension reports **anonymous, aggregate** usage to GA4. That is now **opt-out**: `qt_telemetry` in `chrome.storage.sync`, default `true`, with a switch on the extension options page. Every send passes through `Analytics.isEnabled()`; a missing or throwing storage layer means **no** reporting. What is collected is declared in `PRIVACY.md` and must stay in sync with `analytics.js`
+- The **options page** exists for settings that cannot live in the player. Playback and caption settings stay in the pace pill and the Subtitles/CC menu (§4, §7). Do not migrate them to the options page and do not duplicate them there
+- Licence is **GPL-3.0-or-later** (`LICENSE`). Source files carry an SPDX header. A change that would make the extension non-redistributable under that licence is out of scope
+
 Supersession 2026-08-20 (user session, prints on MrBeast *Last To Leave Mansion*):
 
 - **WPM / lock / trim / clock always use the video’s original language timedtext** (ASR / source). Switching the displayed caption to Arabic, Chinese, Auto-translate, etc. must not change `playbackRate` or the overlay WPM. Character scripts without spaces (zh, ja, th) would otherwise look like huge silence gaps and keep the player at trim-boost
@@ -136,3 +142,26 @@ Allowed:
 7. Native settings: no Playback speed row; Dual/Color/Center only under Subtitles/CC; menus do not stack
 8. ND on: related gone, avatar menu opens, In this video opens, logo does not freeze the tab
 9. Reloading another video does not require toggling CC to make WPM work
+
+## 11. Telemetry and privacy
+
+The extension sends anonymous, aggregate counts to a GA4 property over the Measurement Protocol. This section is the contract; `PRIVACY.md` is the same contract written for users and must not drift from it.
+
+- **Opt-out switch:** `qt_telemetry` in `chrome.storage.sync`. Default `true`. Surfaced on the options page. Absent key = on (a fresh profile before the install defaults land still counts as opted in)
+- **Single choke point:** everything goes through `Analytics.sendEvent`, which returns early on `isEnabled() === false`. No tracker may call `fetch` directly. If the storage layer is missing or throws, the answer is **no reporting**, not a fallback to on
+- **Events, in full:** `extension_installed` (with extension version), `toggle_no_distractions` (on/off), `homepage_redirected`, `video_page_visited`, `feature_usage` (feature name), `page_view`. Adding an event means editing `PRIVACY.md` in the same change
+- **Never collected:** video IDs, video titles, channel names, caption or transcript text, search terms, watch history, URLs, account identity, IP-derived profile beyond what GA4 does by default at the network layer
+- **Installation ID** is a random string in `chrome.storage.local`, generated on first send, resettable from the options page. It is not derived from any account, device or hardware value
+- Telemetry may never gate a feature. The extension must behave identically with the switch off
+
+### Options page
+
+- Exists for what cannot live in the player. Today: the telemetry switch and the installation-ID reset
+- Playback and caption settings stay in the pace pill (§4) and the Subtitles/CC menu (§7). Do not migrate them here, do not mirror them here — two sources of truth for the same toggle is the bug this rule prevents
+- Paint follows §3: flat dark surface, no frost, no hairline border, Roboto, YouTube's on-state switch colors
+
+## 12. Licence
+
+- **GPL-3.0-or-later.** `LICENSE` holds the full text; source files carry an `SPDX-License-Identifier` header
+- Continues `yt-no-distractions-ext`, same author, same licence
+- A change that would make the extension non-redistributable under that licence (a bundled non-free dependency, a proprietary service the extension cannot run without) is out of scope

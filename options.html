@@ -1,0 +1,102 @@
+<!doctype html>
+<!--
+  YouTube Toolkit — options page
+  Copyright (C) 2025  Daniel Gentile
+  SPDX-License-Identifier: GPL-3.0-or-later
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>YouTube Toolkit — Options</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <main class="wrap">
+      <header class="head">
+        <img src="icons/icon48.png" width="40" height="40" alt="" />
+        <div>
+          <h1>YouTube Toolkit</h1>
+          <p class="ver">Version <span id="version">—</span></p>
+        </div>
+      </header>
+
+      <p class="lede">
+        Playback and caption settings live in the player itself — the pace pill and the
+        Subtitles/CC menu. This page holds the one thing that does not belong there.
+      </p>
+
+      <section class="card">
+        <h2>Privacy</h2>
+
+        <label class="row" for="telemetry">
+          <span class="row-text">
+            <span class="row-title">Send anonymous usage statistics</span>
+            <span class="row-sub"
+              >Counts of installs, No Distractions toggles and homepage redirects. No video
+              IDs, no titles, no captions, no search terms, no account data, no browsing
+              history.</span
+            >
+          </span>
+          <input type="checkbox" id="telemetry" />
+          <span class="switch" aria-hidden="true"></span>
+        </label>
+
+        <div class="row row--action">
+          <span class="row-text">
+            <span class="row-title">Installation ID</span>
+            <span class="row-sub"
+              >A random string stored on this device only, used to keep counts from being
+              double-counted. Resetting it makes this installation look brand new.</span
+            >
+          </span>
+          <button type="button" id="reset-id" class="btn">Reset</button>
+        </div>
+
+        <p class="status" id="status" role="status" aria-live="polite"></p>
+
+        <p class="fine">
+          Full detail:
+          <a
+            href="https://github.com/dnl-gentile/yt-toolkit/blob/main/PRIVACY.md"
+            target="_blank"
+            rel="noreferrer noopener"
+            >PRIVACY.md</a
+          >
+        </p>
+      </section>
+
+      <footer class="foot">
+        <a
+          href="https://github.com/dnl-gentile/yt-toolkit"
+          target="_blank"
+          rel="noreferrer noopener"
+          >Source</a
+        >
+        <span>·</span>
+        <a
+          href="https://github.com/dnl-gentile/yt-toolkit/wiki"
+          target="_blank"
+          rel="noreferrer noopener"
+          >Wiki</a
+        >
+        <span>·</span>
+        <a
+          href="https://github.com/dnl-gentile/yt-toolkit/issues/new/choose"
+          target="_blank"
+          rel="noreferrer noopener"
+          >Report a problem</a
+        >
+        <span>·</span>
+        <a
+          href="https://github.com/dnl-gentile/yt-toolkit/blob/main/LICENSE"
+          target="_blank"
+          rel="noreferrer noopener"
+          >GPL-3.0-or-later</a
+        >
+      </footer>
+    </main>
+
+    <script src="options.js"></script>
+  </body>
+</html>
