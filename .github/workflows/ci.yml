@@ -38,6 +38,21 @@ jobs:
       - run: npm ci
       - run: npm run test:integration
 
+  icons:
+    name: icons
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      # Fails if a PNG was hand-edited, is stale against icons/src/icon.svg,
+      # or renders a glyph too small to read at 16px.
+      - run: npm run icons:check
+
   visual:
     name: visual baselines
     runs-on: ubuntu-latest

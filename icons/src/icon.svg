@@ -1,0 +1,47 @@
+<!--
+  YouTube Toolkit card icon — the single source for icons/icon{16,48,128}.png.
+  Copyright (C) 2025  Daniel Gentile
+  SPDX-License-Identifier: GPL-3.0-or-later
+
+  Regenerate with `npm run icons`; verify with `npm run icons:check`. Never
+  hand-edit the PNGs. The set this replaced was a bitmap composite: a glyph
+  pasted over the original white Material `do_not_disturb_on` artwork without
+  removing it, so that icon showed through as dotted arcs behind it.
+
+  Three decisions here, each of which took a wrong turn first:
+
+  1. The badge is the OFFICIAL YouTube silhouette (28.5701 x 20), lifted from
+     the logo. It is NOT a rounded rectangle — the sides bulge, the curvature
+     continuous, closer to a superellipse than to anything `rx` produces. A
+     drawn rect and a square tile were both tried and both read as a generic
+     red app icon, because that bulge is most of what makes the shape
+     recognisable.
+
+  2. The glyph is Material Symbols `home_repair_service`, ROUNDED weight — a
+     toolbox. An outlined wrench was tried and dissolved at 16px: its strokes
+     are half a pixel there. A toolbox is a compact horizontal mass that shares
+     the badge's proportion, so it survives the size Chrome puts in the toolbar.
+
+  3. The glyph is positioned on its INK, not its viewport. `home_repair_service`
+     occupies a wide, short band inside a square 960 viewBox; centring the
+     viewport would sit the toolbox visibly high in the badge.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!--
+    Badge at 116/128 wide, centred. The margin is deliberate: Chrome and the
+    Web Store place this against backgrounds of their own, and a full-bleed
+    shape collides with their padding.
+  -->
+  <g transform="translate(6 23.398) scale(4.060224)" fill="#FF0000">
+    <path d="M27.9727 3.12324C27.6435 1.89323 26.6768 0.926623 25.4468 0.597366C23.2197 2.24288e-07 14.285 0 14.285 0C14.285 0 5.35042 2.24288e-07 3.12323 0.597366C1.89323 0.926623 0.926623 1.89323 0.597366 3.12324C2.24288e-07 5.35042 0 10 0 10C0 10 2.24288e-07 14.6496 0.597366 16.8768C0.926623 18.1068 1.89323 19.0734 3.12323 19.4026C5.35042 20 14.285 20 14.285 20C14.285 20 23.2197 20 25.4468 19.4026C26.6768 19.0734 27.6435 18.1068 27.9727 16.8768C28.5701 14.6496 28.5701 10 28.5701 10C28.5701 10 28.5677 5.35042 27.9727 3.12324Z"/>
+  </g>
+
+  <!--
+    Material Symbols Rounded `home_repair_service` (FILL 0, wght 400, opsz 24),
+    viewBox 0 -960 960 960. Ink bbox is x 80, y -800, 800 x 640; the transform
+    below fits that ink to 62px wide and centres it on the canvas.
+  -->
+  <g transform="translate(26.8 101.2) scale(0.0775)" fill="#FFFFFF">
+    <path d="M480-400ZM80-200v-360q0-33 23.5-56.5T160-640h120v-80q0-33 23.5-56.5T360-800h240q33 0 56.5 23.5T680-720v80h120q33 0 56.5 23.5T880-560v360q0 17-11.5 28.5T840-160H120q-17 0-28.5-11.5T80-200Zm240-160q0 17-11.5 28.5T280-320q-17 0-28.5-11.5T240-360h-80v120h640v-120h-80q0 17-11.5 28.5T680-320q-17 0-28.5-11.5T640-360H320ZM160-560v120h80q0-17 11.5-28.5T280-480q17 0 28.5 11.5T320-440h320q0-17 11.5-28.5T680-480q17 0 28.5 11.5T720-440h80v-120H160Zm200-80h240v-80H360v80Z"/>
+  </g>
+</svg>
