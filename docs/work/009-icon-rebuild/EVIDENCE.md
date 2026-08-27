@@ -86,3 +86,41 @@ $ npm run test:integration
 ℹ pass 13
 ℹ fail 0
 ```
+
+
+## 5. Artwork revisions, and what each was wrong about
+
+Recorded because three of the four were caught by the maintainer, not by me, and
+the reasons generalise.
+
+| Attempt | Wrong because |
+|---|---|
+| Rounded rect badge, filled wrench | The badge is not a rounded rectangle. Its sides bulge; the curvature is continuous. `rx` cannot express it |
+| Square tile, filled wrench | Traded the YouTube identity for 16px legibility. The trade was never necessary — Chrome accepts different artwork per size |
+| Official badge, filled wrench | The filled glyph is a solid slab that loses the wrench silhouette |
+| Official badge, outlined wrench | Dissolved at 16px. Its strokes are half a pixel there, measuring 9% of the badge height |
+
+The shipped artwork is the official badge path with Material Symbols Rounded
+`home_repair_service` — a toolbox, whose compact horizontal mass shares the
+badge's proportion and therefore survives 16px:
+
+```
+$ npm run icons:check
+PASS   16px  matches icon.svg exactly  tile 16x10  glyph 8x5 (50% of badge height)
+PASS   48px  matches icon.svg exactly  tile 44x32  glyph 22x18 (56% of badge height)
+PASS  128px  matches icon.svg exactly  tile 116x82  glyph 62x48 (59% of badge height)
+
+icons ok
+```
+
+### On the legibility floor
+
+It is set at 35%, which is loose. It was briefly set at 60%, where it failed the
+shipped design at 59% — a number I had picked before choosing the glyph. Neither
+squeezing the artwork to satisfy an invented threshold nor lowering it until it
+passed while still implying it tests proportion would have been honest.
+
+So it is now scoped to what it can actually detect: a glyph that has *dissolved*
+(the outlined wrench measured 9%). Whether 56% or 62% is better proportioned is
+a judgement call, and it lives in `icons/src/icon.svg` where it can be argued
+with, rather than smuggled in as a threshold that looks objective.

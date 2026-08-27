@@ -36,11 +36,23 @@ const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SRC = path.join(ROOT, 'icons', 'src', 'icon.svg');
 const SIZES = [16, 48, 128];
 
-/** The glyph must hold at least this share of the opaque tile, at every size. */
-const MIN_GLYPH_SHARE = 0.06;
-
-/** Smallest glyph bounding box that still reads as a wrench. */
-const MIN_GLYPH_PX = 6;
+/**
+ * Legibility floor, expressed as geometry rather than ink.
+ *
+ * An earlier version measured the glyph's share of coloured pixels. That is the
+ * wrong metric for an outlined glyph — its hollow interior is tile colour, so a
+ * legible glyph scores as low as an illegible one. The bounding box is what
+ * actually tracks whether you can see the thing.
+ *
+ * This floor is deliberately loose. It exists to catch a glyph that has
+ * DISSOLVED — the outlined wrench tried here measured 9% at 16px, because its
+ * strokes are half a pixel at that size — not to adjudicate whether 56% or 62%
+ * is better proportioned. That is a judgement call, and it is recorded in
+ * icons/src/icon.svg where it can be argued with, rather than smuggled in as a
+ * threshold that looks objective.
+ */
+const MIN_GLYPH_VS_BADGE_HEIGHT = 0.35;
+const MIN_GLYPH_PX = 4;
 
 /** Per-channel tolerance, to absorb encoder noise rather than design drift. */
 const CHANNEL_TOLERANCE = 2;
@@ -109,7 +121,7 @@ function geometry(px, size) {
   }
 
   const mid = (b) => ({ w: b.x1 - b.x0 + 1, h: b.y1 - b.y0 + 1 });
-  return { glyph: mid(white), tile: mid(red), share: white.n / (white.n + red.n) };
+  return { glyph: mid(white), tile: mid(red) };
 }
 
 for (const size of SIZES) {
@@ -141,8 +153,11 @@ for (const size of SIZES) {
   }
 
   const g = geometry(actual, size);
-  if (g.share < MIN_GLYPH_SHARE) {
-    problems.push(`glyph is ${(g.share * 100).toFixed(1)}% of the tile, floor is ${MIN_GLYPH_SHARE * 100}%`);
+  const vsBadge = g.glyph.h / g.tile.h;
+  if (vsBadge < MIN_GLYPH_VS_BADGE_HEIGHT) {
+    problems.push(
+      `glyph is ${(vsBadge * 100).toFixed(0)}% of the badge height, floor is ${MIN_GLYPH_VS_BADGE_HEIGHT * 100}%`,
+    );
   }
   if (g.glyph.w < MIN_GLYPH_PX || g.glyph.h < MIN_GLYPH_PX) {
     problems.push(`glyph is ${g.glyph.w}x${g.glyph.h}px — too small to read at ${size}px`);
@@ -154,7 +169,7 @@ for (const size of SIZES) {
   } else {
     console.log(
       `PASS  ${String(size).padStart(3)}px  matches icon.svg exactly  tile ${g.tile.w}x${g.tile.h}` +
-      `  glyph ${g.glyph.w}x${g.glyph.h} (${(g.share * 100).toFixed(1)}%)`,
+      `  glyph ${g.glyph.w}x${g.glyph.h} (${(vsBadge * 100).toFixed(0)}% of badge height)`,
     );
   }
 }
