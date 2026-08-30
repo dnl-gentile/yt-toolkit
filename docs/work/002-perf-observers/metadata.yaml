@@ -11,4 +11,6 @@ paths_owned:
   - docs/work/002-perf-observers/
 notes: >
   Do not touch pace.js, captions.js, or styles.css.
-  Real-host verification still pending; grep evidence in EVIDENCE.md.
+  Remediated HIGH 1/3/4/8 (no inner subtree, page-data does not
+  clear isNavigating, restore* uses shouldSkipDomWork, tags not on
+  watch mutations). Real-host still pending; grep evidence in EVIDENCE.md.

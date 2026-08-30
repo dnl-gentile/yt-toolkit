@@ -1,68 +1,93 @@
-/* W-006: native YouTube toggle paint. Beats .ytp-menuitem-toggle-checkbox. */
+/* Native CC Dual/Color/Center use .ytp-menuitem-toggle-checkbox only.
+   Do not restyle that class — YouTube paints Stable Volume with it.
+   Pace lock/trim live outside the player menu, so they copy the same
+   contained pill (40×24, 20px thumb inset 2px). */
 
 .qt-switch,
-.ytp-menuitem-toggle-checkbox.qt-switch {
+#qt-speed-menu .qt-switch {
   display: inline-block !important;
   position: relative !important;
   right: auto !important;
   left: auto !important;
-  width: 36px !important;
-  height: 14px !important;
+  box-sizing: border-box !important;
+  width: 40px !important;
+  height: 24px !important;
   border: 0 !important;
   outline: none !important;
   padding: 0 !important;
   margin: 0 !important;
-  border-radius: 8px !important;
-  background: rgba(255, 255, 255, 0.15) !important; /* off track */
+  border-radius: 12px !important;
+  background: var(
+    --yt-sys-color-baseline--overlay-background-medium-light,
+    rgba(0, 0, 0, 0.3)
+  ) !important;
+  background-color: var(
+    --yt-sys-color-baseline--overlay-background-medium-light,
+    rgba(0, 0, 0, 0.3)
+  ) !important;
+  background-image: none !important;
   cursor: pointer;
   flex-shrink: 0;
   box-shadow: none !important;
   -webkit-tap-highlight-color: transparent;
 }
 
-/* YouTube paints the track on ::before; keep it in lockstep with our fill. */
 .qt-switch::before,
-.ytp-menuitem-toggle-checkbox.qt-switch::before {
-  background: rgba(255, 255, 255, 0.15) !important;
+#qt-speed-menu .qt-switch::before {
+  content: none !important;
+  display: none !important;
 }
 
-.qt-switch::after {
+.qt-switch::after,
+#qt-speed-menu .qt-switch::after {
   content: "" !important;
   position: absolute !important;
+  box-sizing: border-box !important;
   width: 20px !important;
   height: 20px !important;
-  top: -3px !important;
-  left: -3px !important;
+  top: 2px !important;
+  left: 2px !important;
   border-radius: 50% !important;
-  background: #c8c8c8 !important; /* off thumb */
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  background: var(
+    --yt-sys-color-baseline--overlay-text-secondary,
+    rgba(255, 255, 255, 0.7)
+  ) !important;
+  background-color: var(
+    --yt-sys-color-baseline--overlay-text-secondary,
+    rgba(255, 255, 255, 0.7)
+  ) !important;
+  box-shadow: none !important;
   transform: none !important;
+  z-index: 1 !important;
 }
 
 .qt-switch.on,
-.ytp-menuitem[aria-checked="true"] .qt-switch,
-.ytp-menuitem-toggle-checkbox.qt-switch.on {
-  background: rgba(255, 255, 255, 0.55) !important; /* on track — visibly lighter */
-}
-
-.qt-switch.on::before,
-.ytp-menuitem[aria-checked="true"] .qt-switch::before,
-.ytp-menuitem-toggle-checkbox.qt-switch.on::before {
-  background: rgba(255, 255, 255, 0.55) !important;
+#qt-speed-menu .qt-switch.on,
+#qt-speed-menu .qt-switch[aria-checked="true"] {
+  background: var(
+    --yt-sys-color-baseline--overlay-button-primary,
+    rgba(255, 255, 255, 0.3)
+  ) !important;
+  background-color: var(
+    --yt-sys-color-baseline--overlay-button-primary,
+    rgba(255, 255, 255, 0.3)
+  ) !important;
+  background-image: none !important;
 }
 
 .qt-switch.on::after,
-.ytp-menuitem[aria-checked="true"] .qt-switch::after,
-.ytp-menuitem-toggle-checkbox.qt-switch.on::after {
-  background: #ffffff !important; /* on thumb white */
-  left: -3px !important;
-  transform: translateX(22px) !important;
+#qt-speed-menu .qt-switch.on::after,
+#qt-speed-menu .qt-switch[aria-checked="true"]::after {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  left: 18px !important;
+  transform: none !important;
 }
 
 .qt-switch:focus,
 .qt-switch:focus-visible,
-.ytp-menuitem-toggle-checkbox.qt-switch:focus,
-.ytp-menuitem-toggle-checkbox.qt-switch:focus-visible,
+#qt-speed-menu .qt-switch:focus,
+#qt-speed-menu .qt-switch:focus-visible,
 .qt-chrome-btn:focus,
 .qt-chrome-btn:focus-visible,
 .qt-chrome-btn:active,
@@ -75,44 +100,121 @@
   border: 0 !important;
 }
 
-/* Dual / Color / Center: same left-label + native icon column as Off. */
-.ytp-popup.ytp-settings-menu .ytp-menuitem.qt-cap-toggle,
-.ytp-settings-menu .ytp-menuitem.qt-cap-toggle,
-.ytp-menuitem.qt-cap-toggle {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  text-align: left !important;
-}
-
-.ytp-popup.ytp-settings-menu .ytp-menuitem.qt-cap-toggle .ytp-menuitem-icon,
-.ytp-settings-menu .ytp-menuitem.qt-cap-toggle .ytp-menuitem-icon,
+/* Dual/Color/Center: same table row as Off. Native toggle in content.
+   Icon column keeps Off's left inset — do not collapse it, do not center. */
 .ytp-menuitem.qt-cap-toggle .ytp-menuitem-icon {
-  width: 40px !important;
+  width: 24px !important;
   min-width: 24px !important;
-  max-width: 40px !important;
-  flex: 0 0 40px !important;
   box-sizing: border-box !important;
 }
-
-.ytp-popup.ytp-settings-menu .ytp-menuitem.qt-cap-toggle .ytp-menuitem-label,
-.ytp-settings-menu .ytp-menuitem.qt-cap-toggle .ytp-menuitem-label,
 .ytp-menuitem.qt-cap-toggle .ytp-menuitem-label {
   text-align: left !important;
-  justify-content: flex-start !important;
-  margin-left: 0 !important;
-  margin-right: auto !important;
+  white-space: nowrap !important;
+}
+.ytp-menuitem.qt-cap-toggle .ytp-menuitem-content {
+  width: auto !important;
+  min-width: 40px !important;
+  max-width: none !important;
+  overflow: visible !important;
+}
+.ytp-menuitem.qt-cap-toggle .ytp-menuitem-content .ytp-menuitem-toggle-checkbox {
+  display: inline-block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Current YouTube language rows are label-only and paint the white radio
+   check as a label background. Dual mode owns only that paint, not ARIA. */
+.ytp-menuitem.qt-dual-lang .ytp-menuitem-label {
+  position: relative !important;
+  background-image: none !important;
+}
+.ytp-menuitem.qt-dual-lang .ytp-menuitem-content svg,
+.ytp-menuitem.qt-dual-lang .ytp-menuitem-content [aria-checked] {
+  visibility: hidden !important;
+}
+.ytp-menuitem.qt-dual-lang[data-qt-slot] .qt-dual-check {
+  position: absolute !important;
+  left: var(--qt-check-left, 10px) !important;
+  top: 50% !important;
+  display: block !important;
+  width: var(--qt-check-width, 12px) !important;
+  height: var(--qt-check-height, 12px) !important;
+  transform: translateY(-50%) !important;
+  color: inherit !important;
+  background-color: currentColor !important;
+  -webkit-mask-image: var(--qt-native-check-image) !important;
+  mask-image: var(--qt-native-check-image) !important;
+  -webkit-mask-position: center !important;
+  mask-position: center !important;
+  -webkit-mask-repeat: no-repeat !important;
+  mask-repeat: no-repeat !important;
+  -webkit-mask-size: 100% 100% !important;
+  mask-size: 100% 100% !important;
+  pointer-events: none !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+}
+.ytp-menuitem.qt-dual-lang[data-qt-slot] .qt-dual-check.qt-dual-check-svg {
+  background: none !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+}
+.ytp-menuitem.qt-dual-lang[data-qt-slot] .qt-dual-check svg {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  color: inherit !important;
+}
+.ytp-menuitem.qt-dual-lang[data-qt-slot="0"] .qt-dual-check {
+  color: #ffcc00 !important;
+}
+.ytp-menuitem.qt-dual-lang[data-qt-slot="1"] .qt-dual-check {
+  color: #3ea6ff !important;
+}
+
+/* Color highlight / Center word need original-language ASR word onsets. */
+.ytp-menuitem.qt-cap-disabled {
+  opacity: 0.38 !important;
+  cursor: default !important;
+}
+.ytp-menuitem.qt-cap-disabled:hover {
+  background: transparent !important;
+}
+
+/* Shorts captions use the document-level contextual sheet rather than the
+   classic `.ytp-settings-menu`. Keep the native host row class/paint and add
+   only the checkbox layout; the sheet owns opacity, blur, radius and shadow. */
+[role="menu"] > .qt-shorts-cap-toggle {
+  display: flex !important;
+  align-items: center !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  color: inherit !important;
+  cursor: pointer !important;
+  outline: none !important;
+}
+
+[role="menu"] > .qt-shorts-cap-toggle .qt-shorts-cap-content {
+  display: flex !important;
+  align-items: center !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  color: inherit !important;
+  cursor: inherit !important;
+}
+
+[role="menu"] > .qt-shorts-cap-toggle .qt-shorts-cap-label {
   flex: 1 1 auto !important;
+  min-width: 0 !important;
+  color: inherit !important;
+  font: inherit !important;
   white-space: nowrap !important;
 }
 
-.ytp-popup.ytp-settings-menu .ytp-menuitem.qt-cap-toggle .ytp-menuitem-content,
-.ytp-settings-menu .ytp-menuitem.qt-cap-toggle .ytp-menuitem-content,
-.ytp-menuitem.qt-cap-toggle .ytp-menuitem-content {
-  margin-left: auto !important;
-  text-align: right !important;
-  display: flex !important;
-  justify-content: flex-end !important;
-  align-items: center !important;
-  flex: 0 0 auto !important;
+[role="menu"] > .qt-shorts-cap-toggle.qt-cap-disabled {
+  opacity: 0.38 !important;
+  cursor: default !important;
 }

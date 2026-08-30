@@ -25,23 +25,38 @@ const analytics = new Analytics('G-Y6EVNLSKLJ', 'JuFahXeVR0anCWYMk94y4g');
 
 // Set the default state on installation
 chrome.runtime.onInstalled.addListener((details) => {
-  chrome.storage.sync.set({
+  const defaults = {
     noDistractionsEnabled: true,
     qt_targetWpm: 180,
     qt_paceLock: true,
     qt_trimSilence: true,
+    qt_playbackRate: 1,
+    qt_fixed1x: false,
     qt_overlayMode: "both",
     qt_wordHighlight: true,
     qt_centerWord: false,
     qt_dualCaptions: false,
     qt_captionBg: true,
+    qt_captionLangs: [],
+    qt_primaryTrack: "",
+    qt_secondaryTrack: "",
+    qt_vjs_dualCaptions: false,
+    qt_vjs_primaryTrack: "",
+    qt_vjs_secondaryTrack: "",
+    qt_vjs_slotsChosen: false,
+    qt_captionsEnabled: null,
+  };
+  chrome.storage.sync.get(Object.keys(defaults), (s) => {
+    const patch = {};
+    for (const k of Object.keys(defaults)) {
+      if (s[k] === undefined) patch[k] = defaults[k];
+    }
+    if (Object.keys(patch).length) {
+      chrome.storage.sync.set(patch);
+      chrome.storage.local.set(patch);
+    }
   });
-  console.log("YouTube Toolkit installed.");
-  
-  // Track installation
-  if (details.reason === 'install') {
-    analytics.trackInstall();
-  }
+  if (details.reason === "install") analytics.trackInstall();
 });
 
 // Listen for navigation events to 'youtube.com'

@@ -83,4 +83,19 @@ describe("stable adjusted duration", () => {
     const b = clock.watchSecs(0, orig, { playbackRate: 2 });
     assert.ok(b < a - 60, "2x should be >1 min shorter than 1.5x, got " + a + " vs " + b);
   });
+
+  it("clock and trim share leading/interior/trailing silence eligibility", () => {
+    const words = [
+      { w: "a", low: "a", t: 3 },
+      { w: "b", low: "b", t: 5 },
+    ];
+    const cut = (t0, t1) => wpm.silenceCut(words, t0, t1, 1.2);
+    const adjusted = clock.watchSecs(0, 6, {
+      playbackRate: 1,
+      trimSilence: true,
+      silenceCut: cut,
+    });
+    /* leading 0.25→3 and interior 3.25→5 are removed; trailing 1s is kept */
+    assert.equal(adjusted, 1.5);
+  });
 });

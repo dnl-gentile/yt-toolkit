@@ -1,0 +1,22 @@
+id: W-009
+slug: 009-asr-timing
+title: "WPM, lock, trim, and word rhythm always use auto-generated timedtext"
+tier: L
+tier_rationale: >
+  WPM / lock / trim / clock / highlight consume QT.cues. Uploaded same-lang
+  captions overwrite ASR and drop per-word tOffsetMs, desyncing pace and
+  highlight from speech. Path floor L.
+status: implemented
+paths_owned:
+  - lib/timedtext.js
+  - content/inject.js
+  - content/pace.js
+  - content/captions.js
+  - tests/timedtext.test.js
+  - docs/work/004-original-track/smoke.js
+  - docs/work/009-asr-timing/
+  - docs/SPEC.md
+notes: >
+  Pin originalTrack to kind=asr (vssId a.*). Uploaded lang=en is original:false
+  when ASR exists. adoptOriginalCues never lets uploaded replace ASR.
+  Highlight wordIndexAt follows tOffsetMs, not even cue split.

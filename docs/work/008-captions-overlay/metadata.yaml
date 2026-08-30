@@ -1,0 +1,18 @@
+id: W-008
+slug: 008-captions-overlay
+title: "Overlay follows Dual while paused; size = native; Dual lines not glued"
+tier: M
+tier_rationale: >
+  User-visible caption overlay (Dual / highlight / Center word). Quality.md
+  §3 path M — independent review of the diff; live screenshot still required
+  to close the slice.
+status: implemented
+paths_owned:
+  - content/captions.js
+  - docs/work/008-captions-overlay/
+notes: >
+  W-003 still documents the original Dual inject. This slice owns
+  content/captions.js only — do not edit styles.css, yt-menu-patch.js, or
+  lib/dual-lang.js. Slot identity is YtToolkitDual.uniqueLangs / langBase.
+  SPEC.md §7 supersession (paused Dual, one font function, 48px stack) is
+  a one-paragraph product-law update required by AGENTS.md.

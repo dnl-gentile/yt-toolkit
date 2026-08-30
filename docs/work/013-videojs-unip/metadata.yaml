@@ -1,0 +1,28 @@
+id: W-013
+slug: 013-videojs-unip
+title: "Adapt Toolkit playback and Dual captions to the UNIP Video.js player"
+tier: L
+tier_rationale: >
+  Adds transport control and caption-mode mutation inside an authenticated
+  third-party player. A regression could freeze the course page or hide its
+  native captions, so the slice requires refutation review and real-host QA.
+status: implemented_pending_live_acceptance
+paths_owned:
+  - manifest.json
+  - background.js
+  - lib/prefs.js
+  - lib/videojs.js
+  - content/videojs-main.js
+  - content/videojs.js
+  - styles-videojs.css
+  - tests/videojs.test.js
+  - tests/integration/manifest.test.js
+  - tests/prefs.test.js
+  - README.md
+  - docs/SPEC.md
+  - docs/QUALITY.md
+  - docs/work/013-videojs-unip/
+notes: >
+  No Distractions remains YouTube-only. The MAIN bridge reads existing
+  TextTrack objects and never intercepts network traffic. UNIP cue-level VTT
+  may drive Dual display but never WPM or other word-rhythm features.

@@ -1,13 +1,36 @@
-/* Top-center pace + time cluster. Must not cover YouTube's top-right info cards. */
-.qt-cluster-wrap {
+/* Speed pill: same 12px inset as YouTube top/bottom chrome. */
+#movie_player #qt-cluster.qt-cluster-wrap,
+.html5-video-player #qt-cluster.qt-cluster-wrap {
+  position: absolute !important;
   top: 12px !important;
-  left: 50% !important;
-  right: auto !important;
-  transform: translateX(-50%) !important;
-  z-index: 45 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  bottom: auto !important;
+  transform: none !important;
+  margin: 0 !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: flex-start !important;
+  height: auto !important;
+  max-height: 48px !important;
+  box-sizing: border-box !important;
+  pointer-events: none !important;
+  z-index: 60 !important;
 }
-#qt-speed-menu.qt-menu {
-  top: 56px !important;
+#movie_player #qt-cluster.qt-cluster-wrap.qt-short-lane-tight,
+.html5-video-player #qt-cluster.qt-cluster-wrap.qt-short-lane-tight {
+  justify-content: flex-end !important;
+}
+#movie_player #qt-cluster.qt-cluster-wrap.qt-overlay-off,
+.html5-video-player #qt-cluster.qt-cluster-wrap.qt-overlay-off {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+#movie_player #qt-speed-menu.qt-menu,
+.html5-video-player #qt-speed-menu.qt-menu {
+  top: 60px !important;
   left: 50% !important;
   right: auto !important;
   transform: translateX(-50%) !important;
@@ -17,26 +40,64 @@
   font-weight: 400;
 }
 
-/* Native YouTube clock stays native — we no longer hide it. */
-.ytp-time-display.qt-time-native-hide {
-  display: inline-flex !important;
-  width: auto !important;
-  min-width: 0 !important;
-  max-width: none !important;
-  padding: unset !important;
-  margin: unset !important;
-  opacity: 1 !important;
-  pointer-events: auto !important;
-  overflow: visible !important;
-}
-#qt-time-pill {
+html:not(.qt-miniplayer-active) #movie_player .ytp-left-controls .ytp-time-display:not(#qt-time-pill),
+html:not(.qt-miniplayer-active) #movie_player .ytp-left-controls .ytp-time-wrapper,
+html:not(.qt-miniplayer-active) #movie_player .ytp-left-controls .ytp-time-contents,
+html:not(.qt-miniplayer-active) #movie_player .ytp-chrome-bottom .ytp-time-current,
+html:not(.qt-miniplayer-active) #movie_player .ytp-chrome-bottom .ytp-time-duration {
   display: none !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  font-size: 0 !important;
+}
+#movie_player #qt-time-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  align-self: center !important;
+  line-height: 1 !important;
+  opacity: 1 !important;
+  width: auto !important;
+  font-size: 13px !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
 }
 
 /* Dual lines: native-like stack, not glued. */
 #movie_player .qt-cap-s {
-  bottom: 136px !important;
+  bottom: 148px !important;
 }
 #movie_player .qt-cap-s.qt-rsvp {
-  bottom: 156px !important;
+  bottom: 168px !important;
+}
+
+/* One background per cue — never per word. */
+#movie_player .qt-caption .qt-w,
+#movie_player .qt-caption .qt-w-on,
+#movie_player .qt-caption .qt-orp {
+  background: none !important;
+}
+
+/* Shorts supports one Highlight/Center surface only. The active player is
+   narrow and portrait, so Center Word may contract but never spill outside
+   the video; the saved Dual preference remains available on `/watch`. */
+#shorts-player .qt-cap-line.qt-cap-shorts {
+  width: min(88%, 720px) !important;
+  max-width: calc(100% - 24px) !important;
+}
+
+#shorts-player .qt-cap-line.qt-cap-shorts.qt-rsvp {
+  width: min(68%, 300px) !important;
+  min-width: min(180px, calc(100% - 24px)) !important;
+  max-width: calc(100% - 24px) !important;
+}
+
+#shorts-player .qt-cap-s.qt-cap-shorts {
+  display: none !important;
+}
+
+#shorts-player .qt-caption .qt-w,
+#shorts-player .qt-caption .qt-w-on,
+#shorts-player .qt-caption .qt-orp {
+  background: none !important;
 }

@@ -5,3 +5,6 @@ test-results/
 blob-report/
 .DS_Store
 *.zip
+
+# Playwright CLI scratch output
+.playwright-cli/

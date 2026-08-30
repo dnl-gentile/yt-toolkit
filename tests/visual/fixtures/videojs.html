@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en" data-qt-videojs-fixture>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>UNIP Video.js adapter fixture</title>
+    <link rel="stylesheet" href="../../../styles-videojs.css" />
+    <style>
+      html,
+      body {
+        min-height: 100%;
+        margin: 0;
+        background: #ececec;
+        font: 14px Arial, sans-serif;
+      }
+      body {
+        display: grid;
+        place-items: center;
+        min-height: 100vh;
+      }
+      .video-js {
+        position: relative;
+        width: var(--fixture-width, 738px);
+        height: var(--fixture-height, 415px);
+        overflow: hidden;
+        color: #fff;
+        background:
+          linear-gradient(90deg, rgba(0, 34, 146, 0.96), rgba(36, 90, 198, 0.82)),
+          #16449f;
+      }
+      .teacher {
+        position: absolute;
+        inset: 17% 24% 0;
+        border-radius: 48% 48% 0 0;
+        background: rgba(12, 18, 28, 0.55);
+      }
+      .vjs-control-bar {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 5;
+        display: flex;
+        align-items: center;
+        height: 30px;
+        background: rgba(43, 51, 63, 0.88);
+      }
+      .vjs-control {
+        display: grid;
+        place-items: center;
+        box-sizing: border-box;
+        width: 40px;
+        height: 30px;
+      }
+      .vjs-current-time,
+      .vjs-duration {
+        width: 26px;
+      }
+      .vjs-time-divider {
+        width: 14px;
+      }
+      .vjs-spacer {
+        flex: 1;
+      }
+      app-settings {
+        display: block;
+        width: 40px;
+      }
+      button {
+        color: inherit;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="video1" class="video-js vjs-v8 vjs-has-started vjs-paused vjs-user-active">
+      <video id="video1_html5_api" class="vjs-tech"></video>
+      <div class="teacher" aria-hidden="true"></div>
+      <div class="vjs-text-track-display"></div>
+      <div class="vjs-control-bar">
+        <button class="vjs-play-control vjs-control" aria-label="Play">▶</button>
+        <div class="vjs-volume-panel vjs-control">◕</div>
+        <div class="vjs-current-time vjs-control">0:20</div>
+        <div class="vjs-time-divider vjs-control">/</div>
+        <div class="vjs-duration vjs-control">13:52</div>
+        <div class="vjs-spacer"></div>
+        <app-settings><button class="vjs-control" aria-label="Settings">⚙</button></app-settings>
+        <button class="vjs-fullscreen-control vjs-control" aria-label="Fullscreen">⛶</button>
+      </div>
+    </div>
+    <script>
+      const params = new URLSearchParams(location.search);
+      const width = Number(params.get("width")) || 738;
+      const height = Number(params.get("height")) || 415;
+      document.documentElement.style.setProperty("--fixture-width", width + "px");
+      document.documentElement.style.setProperty("--fixture-height", height + "px");
+      const video = document.querySelector("video");
+      Object.defineProperty(video, "duration", { configurable: true, value: 832 });
+      Object.defineProperty(video, "currentTime", { configurable: true, writable: true, value: 20 });
+    </script>
+    <script src="../../../lib/prefs.js"></script>
+    <script src="../../../lib/clock.js"></script>
+    <script src="../../../lib/videojs.js"></script>
+    <script src="../../../content/videojs.js"></script>
+    <script>
+      setTimeout(() => {
+        const tracks = [
+          {
+            id: "pt",
+            language: "pt",
+            label: "Português",
+            mode: "showing",
+            cues: [{ start: 0, end: 40, text: "O objetivo da disciplina de contabilidade comercial" }],
+          },
+          {
+            id: "en",
+            language: "en",
+            label: "English",
+            mode: "disabled",
+            cues: [{ start: 0, end: 40, text: "The objective of commercial accounting" }],
+          },
+          { id: "de", language: "de", label: "Deutsch", mode: "disabled", cues: [] },
+        ];
+        postMessage(
+          {
+            source: "quiettube-videojs-main",
+            type: "QT_VIDEOJS_TRACKS",
+            payload: JSON.stringify({ generation: 1, duration: 832, tracks }),
+          },
+          "*",
+        );
+        setTimeout(() => {
+          if (params.get("menu") !== "0")
+            document.querySelector(".qt-vjs-speed-button")?.click();
+          if (params.get("dual") !== "0")
+            setTimeout(() => document.querySelector("[data-action='dual']")?.click(), 50);
+        }, 50);
+      }, 50);
+    </script>
+  </body>
+</html>

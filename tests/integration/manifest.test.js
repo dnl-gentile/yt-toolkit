@@ -23,9 +23,72 @@ test("manifest loads dual-lang before menu/captions", () => {
 test("pace menu switch is qt-switch only (not YouTube checkbox class)", () => {
   const src = fs.readFileSync(path.join(root, "content/pace.js"), "utf8");
   assert.equal(
-    /ytp-menuitem-toggle-checkbox qt-switch/.test(src),
+    /ytp-menuitem-toggle-checkbox/.test(src),
     false,
-    "pace lock/trim must not use ytp-menuitem-toggle-checkbox — YouTube paints that track dark",
+    "pace lock/trim must not use ytp-menuitem-toggle-checkbox",
   );
   assert.match(src, /class="qt-switch/);
+});
+
+test("CC Dual/Color/Center use native checkbox, not qt-switch", () => {
+  const src = fs.readFileSync(path.join(root, "content/yt-menu-patch.js"), "utf8");
+  assert.match(src, /class="ytp-menuitem-toggle-checkbox"/);
+  assert.equal(
+    /ytp-menuitem-toggle-checkbox qt-switch/.test(src),
+    false,
+    "native checkbox must not also carry qt-switch",
+  );
+});
+
+test("idle observer and pace/captions scheduler budgets stay bounded", () => {
+  const menu = fs.readFileSync(path.join(root, "content/yt-menu-patch.js"), "utf8");
+  const pace = fs.readFileSync(path.join(root, "content/pace.js"), "utf8");
+  const captions = fs.readFileSync(path.join(root, "content/captions.js"), "utf8");
+  assert.equal(
+    (menu.match(/new MutationObserver/g) || []).length,
+    2,
+    "menu may observe only the open menu and the active player's local lifecycle",
+  );
+  const broadRootObserver =
+    /observe\(\s*document\.(?:body|documentElement)\s*,\s*\{[\s\S]{0,220}?subtree\s*:\s*true/;
+  assert.doesNotMatch(menu, broadRootObserver);
+  assert.doesNotMatch(captions, broadRootObserver);
+  assert.match(menu, /activePlayerObserver\.observe\(root,/);
+  assert.match(captions, /playerLifecycleObserver\.observe\(root,/);
+  assert.equal(
+    (pace.match(/setInterval\s*\(/g) || []).length,
+    1,
+    "pace owns the single content watchdog",
+  );
+  assert.equal(
+    (captions.match(/setInterval\s*\(/g) || []).length,
+    0,
+    "captions must share the pace frame instead of polling separately",
+  );
+  assert.match(captions, /qt-toolkit-frame/);
+});
+
+test("UNIP uses an isolated, frame-aware Video.js adapter", () => {
+  const m = JSON.parse(fs.readFileSync(path.join(root, "manifest.json"), "utf8"));
+  const unip = m.content_scripts.filter((script) =>
+    (script.matches || []).includes("https://tvweb3.unip.br/*"),
+  );
+  assert.equal(unip.length, 2, "expected MAIN bridge plus isolated adapter");
+  assert.ok(unip.every((script) => script.all_frames === true));
+  const main = unip.find((script) => script.world === "MAIN");
+  const isolated = unip.find((script) => script.world !== "MAIN");
+  assert.deepEqual(main.js, ["content/videojs-main.js"]);
+  assert.deepEqual(isolated.css, ["styles-videojs.css"]);
+  assert.equal(isolated.run_at, "document_start");
+  assert.ok(isolated.js.includes("content/videojs.js"));
+  assert.ok(isolated.js.includes("lib/videojs.js"));
+  const forbidden = [
+    "content/inject.js",
+    "content_script_youtube.js",
+    "content/yt-menu-patch.js",
+    "content/pace.js",
+    "content/captions.js",
+  ];
+  forbidden.forEach((file) => assert.ok(!isolated.js.includes(file), file + " leaked into UNIP"));
+  assert.ok(!isolated.js.some((file) => /distraction/i.test(file)));
 });

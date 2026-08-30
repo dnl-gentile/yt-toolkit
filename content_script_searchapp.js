@@ -47,7 +47,14 @@
 
   // Add click listener
   button.addEventListener('click', () => {
-    chrome.runtime.sendMessage({ action: 'toggleNoDistractions' });
+    const Ext = globalThis.YtToolkitExt;
+    if (Ext) Ext.send({ action: 'toggleNoDistractions' });
+    else {
+      try {
+        if (chrome.runtime && chrome.runtime.id)
+          chrome.runtime.sendMessage({ action: 'toggleNoDistractions' });
+      } catch { /* context invalidated */ }
+    }
   });
 
   // Add hover listeners for custom tooltip and circular background
@@ -72,6 +79,15 @@
   button.setAttribute('aria-label', 'Toggle No Distractions Mode');
 
   // Add the button to the page
+  let bodyObserver = null;
+  function observeBody() {
+    if (!document.body || bodyObserver) return;
+    bodyObserver = new MutationObserver(() => {
+      if (!button.isConnected) addButtonToPage();
+    });
+    bodyObserver.observe(document.body, { childList: true });
+  }
+
   function addButtonToPage() {
     // Check if button already exists
     if (document.getElementById('quiet-mode-toggle-button')) {
@@ -81,6 +97,7 @@
     // Wait for body to be available
     if (document.body) {
       document.body.appendChild(button);
+      observeBody();
     } else {
       // If body isn't ready, wait for it
       if (document.readyState === 'loading') {
@@ -117,10 +134,16 @@
   }
 
   // Set its initial state
-  chrome.storage.sync.get(['noDistractionsEnabled'], ({ noDistractionsEnabled }) => {
-    // Default to true if storage is not set (shouldn't happen, but safe)
-    updateIcon(noDistractionsEnabled ?? true);
-  });
+  try {
+    chrome.storage.sync.get(['noDistractionsEnabled'], ({ noDistractionsEnabled }) => {
+      // Default to true if storage is not set (shouldn't happen, but safe)
+      updateIcon(noDistractionsEnabled ?? true);
+    });
+  } catch {
+    /* Reloading an unpacked extension invalidates content scripts already in
+       open tabs. The exit control must remain available until the tab reloads. */
+    updateIcon(true);
+  }
   
   // No need to watch for theme changes on search app - always uses white icon
 

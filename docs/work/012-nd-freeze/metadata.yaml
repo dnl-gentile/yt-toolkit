@@ -1,0 +1,29 @@
+id: W-012
+slug: 012-nd-freeze
+title: "No Distractions froze the tab: self-feeding masthead observer + theater click storm"
+tier: L
+tier_rationale: >
+  Anything that can freeze YouTube is tier L (QUALITY.md §3, SPEC §9).
+  Reproduced, fixed, mutation-checked, and verified on the real host.
+status: implemented
+paths_owned:
+  - content_script_youtube.js
+  - tests/browser/nd-freeze.spec.js
+  - tests/live/probe.spec.js
+  - docs/work/012-nd-freeze/
+notes: >
+  User report: opening YouTube froze the whole browser with a completely
+  clean console. That is a main-thread busy loop, not an exception.
+  Root cause: chromeObserver watches ytd-masthead with subtree:true, and
+  updateIcon() assigned tooltip.textContent unconditionally on every pass.
+  Assigning textContent replaces the text node, which is a childList mutation
+  inside the observed subtree, so the extension re-fired its own observer once
+  per animation frame forever. Each pass also ran collapseLeftSidebar(), which
+  called getComputedStyle + offsetWidth on five selectors (forced synchronous
+  layout) and rewrote seven style properties, because YouTube keeps the
+  `opened` attribute on #guide so the isExpanded test never went false.
+  Measured 1200 masthead mutations in 2 s on a fixture and 944 on real
+  YouTube. Separately enableTheaterMode() clicked the size button 53 times in
+  one run, because `!label.includes('fullscreen')` is true for an empty label.
+  A responsiveness gate was added to the live probe: it fails on the pre-fix
+  code (944 records in 2 s) and passes after (0).

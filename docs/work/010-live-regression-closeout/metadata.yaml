@@ -1,0 +1,54 @@
+id: W-010
+slug: 010-live-regression-closeout
+title: "Close live WPM, Dual Subtitles, and menu-click regressions"
+tier: L
+tier_rationale: >
+  ASR acquisition controls WPM, Pace Lock, Trim, and clock. The same patch
+  touches the live YouTube captions/settings DOM and must preserve CC state,
+  selected caption state, and the host menu. Path floor L.
+status: implemented
+supersedes:
+  - W-006
+  - W-007
+  - W-008
+  - W-009
+paths_owned:
+  - README.md
+  - background.js
+  - content/inject.js
+  - content/pace.js
+  - content/captions.js
+  - content/yt-menu-patch.js
+  - content_script_youtube.js
+  - lib/timedtext.js
+  - lib/prefs.js
+  - lib/wpm.js
+  - styles-toggles.css
+  - styles.css
+  - styles-overlay.css
+  - tests/browser/
+  - tests/integration/asr-invariance.test.js
+  - tests/integration/manifest.test.js
+  - tests/live/probe.spec.js
+  - tests/live/README.md
+  - tests/timedtext.test.js
+  - tests/prefs.test.js
+  - tests/wpm.test.js
+  - tests/clock.test.js
+  - docs/work/008-captions-overlay/check.mjs
+  - docs/work/010-live-regression-closeout/
+  - docs/SPEC.md
+  - docs/QUALITY.md
+  - package.json
+  - playwright.config.js
+  - .github/workflows/ci.yml
+notes: >
+  Failures reproduced 2026-08-20: CC OFF returned ON, 319 timedtext requests
+  in 8 seconds, label-only language rows received no colored check, native
+  click escaped and closed the menu, Playback speed remained visible, manual
+  rate changes left the current clock stale, and miniplayer could hide every
+  clock or show two. Implementation is green in fixtures and disposable live;
+  Shorts now also mounts the singleton pace pill in the active player's free
+  top-center lane. Real-profile A → B/C acceptance is closed: original-language
+  ASR kept 400 WPM with CC off while caption, pace, and trim preferences
+  persisted; the user's original CC/Dual state was restored afterward.

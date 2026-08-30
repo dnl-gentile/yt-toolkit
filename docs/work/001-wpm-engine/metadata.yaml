@@ -5,7 +5,7 @@ tier: L
 tier_rationale: >
   WPM/lock/trim math is the feature that has been wrong across v1.3–v1.5.24.
   Path floor L (quality.md §3). No source may lower it.
-status: in-progress
+status: implemented
 paths_owned:
   - lib/timedtext.js
   - lib/wpm.js
@@ -18,4 +18,5 @@ paths_owned:
   - docs/work/001-wpm-engine/
 notes: >
   pace.js is rewired in a follow-up slice after this engine is green.
-  Do not edit content/pace.js in this item.
+  Do not edit content/pace.js in this item. Historical ownership was released
+  before W-015 began its weighted-cadence supersession.

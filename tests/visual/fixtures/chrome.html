@@ -11,15 +11,22 @@
     .stage { position: relative; width: 960px; height: 540px; background: #333; }
     #qt-cluster { position: absolute; }
     #qt-speed-menu { position: absolute; display: block; }
+    .paint-lab { display: grid; grid-template-columns: 240px 240px; gap: 20px; }
+    .paint-surface { width: 240px; height: 96px; display: grid; place-items: center; }
+    .paint-surface--light { background: rgb(240, 240, 240); }
+    .paint-surface--dark { background: rgb(24, 32, 40); }
   </style>
 </head>
 <body>
   <div class="stage" id="movie_player">
     <div id="qt-cluster" class="qt-cluster-wrap">
       <div class="qt-chrome-cluster">
-        <span class="qt-cluster-label">6:35 / 6:35 <span class="qt-orig-time">(13:09)</span>   ·   180 WPM  ·  2x</span>
+        <span class="qt-cluster-label">180 WPM  ·  2x</span>
         <div class="qt-chrome-btn" aria-label="Playback speed"></div>
       </div>
+    </div>
+    <div class="ytp-left-controls">
+      <span id="qt-time-pill" class="ytp-time-display">6:35 / 6:35<span class="qt-orig-time">&nbsp;(13:09)</span></span>
     </div>
     <div id="qt-speed-menu" class="qt-menu">
       <div class="qt-row" data-toggle="paceLock">
@@ -34,6 +41,17 @@
         <span class="qt-row-label">Off row</span>
         <div class="qt-switch" aria-checked="false"></div>
       </div>
+    </div>
+  </div>
+  <!-- Kept below the 540px screenshot viewport. The visual test reads these
+       deterministic surfaces to prove that the same translucent native paint
+       composes over both bright and dark video frames. -->
+  <div class="paint-lab" aria-hidden="true">
+    <div class="paint-surface paint-surface--light" data-surface="light">
+      <div class="qt-chrome-cluster qt-paint-probe">180 WPM · 2x</div>
+    </div>
+    <div class="paint-surface paint-surface--dark" data-surface="dark">
+      <div class="qt-chrome-cluster qt-paint-probe">180 WPM · 2x</div>
     </div>
   </div>
 </body>
