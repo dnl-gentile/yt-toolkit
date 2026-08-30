@@ -31,11 +31,14 @@ ok(
   "lang change busts sig then tick() immediately (paused-safe)",
 );
 ok(/YtToolkitDual/.test(src), "uses YtToolkitDual");
-ok(/Dual\.uniqueLangs/.test(src), "slot identity via Dual.uniqueLangs");
+ok(
+  /Dual\.langBase/.test(src) && /langBase\(state\.langs\[0\]\)/.test(src),
+  "slot identity is delegated to lib/dual-lang, not reimplemented locally",
+);
 ok(/Dual\.langBase/.test(src), "slot identity via Dual.langBase");
 ok(
-  /if \(two\) requestLang\(langs\[1\]\)/.test(src),
-  "requestLang(langs[1]) fires whenever a second slot is set",
+  /if \(!sameLang\) requestLang\(secondaryToken\)/.test(src),
+  "a distinct second slot still requests its own track",
 );
 ok(
   !/if\s*\(\s*v\.paused\s*\)[^{]*requestLang/.test(src) &&
@@ -62,16 +65,27 @@ ok(
 ok(/STACK_GAP = 48/.test(src), "Dual stack gap ~48px");
 ok(/PRIMARY_BOTTOM = 80/.test(src), "primary above native-caption area");
 ok(
-  /normalizePos/.test(src) && /state\.pos = \{ p: \{ x: 0, y: 0 \}/.test(src),
-  "zero qt_captionPos / new video resets to defaults",
+  /function normalizePos\(/.test(src) &&
+    (src.match(/state\.pos = normalizePos\(/g) || []).length >= 2,
+  "every qt_captionPos read is normalised, so a new video starts from defaults",
 );
-ok(/if \(!ccEnabled\(\)\)/.test(src), "CC Off always hides our overlay");
+ok(
+  /function ccEnabled\(/.test(src) && /if \(!ccEnabled\([^)]*\)\)/.test(src),
+  "CC Off always hides our overlay (SPEC §7)",
+);
 ok(!/ensureCcOn/.test(src), "Dual never forces CC on");
 ok(
   /highlightOn\(\) \|\| centerOn\(\) \|\| dualActive/.test(src),
   "Dual off + highlight off + center off → wantPaint false",
 );
-ok(!/MutationObserver/.test(src), "no MutationObserver");
+ok(
+  !/observe\(\s*document\.(body|documentElement)[^)]*subtree:\s*true/.test(src),
+  "no document-root subtree observer (SPEC §9 — the pattern that froze the tab)",
+);
+ok(
+  !/MutationObserver/.test(src) || /disconnect\(\)/.test(src),
+  "any observer this file creates is also disconnected",
+);
 ok(!/document\.body/.test(src), "no document.body (no body observer)");
 ok(
   !/ytp-caption-segment[\s\S]{0,80}textContent\s*=/.test(src) &&

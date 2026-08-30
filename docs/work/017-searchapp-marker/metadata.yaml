@@ -1,5 +1,5 @@
-id: W-008
-slug: 008-searchapp-marker
+id: W-017
+slug: 017-searchapp-marker
 title: "Presence marker on the quiet page, so the update notice can skip current users"
 tier: S
 tier_rationale: >
@@ -9,7 +9,7 @@ status: implemented
 paths_owned:
   - content_script_searchapp.js
   - tests/integration/searchapp-marker.test.js
-  - docs/work/008-searchapp-marker/
+  - docs/work/017-searchapp-marker/
 notes: >
   Consumed by the yt-search-bar site, which shows an update notice only when the
   old extension is detected. Removing the marker does not break this repo — it
