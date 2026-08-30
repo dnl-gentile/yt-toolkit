@@ -1,0 +1,76 @@
+name: Host drift (YouTube changed something)
+description: A selector, menu label or API shape moved and the extension is mis-binding.
+labels: ["host-drift", "bug"]
+title: "host-drift: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        YouTube renames classes and restructures menus without notice. Two patches here are
+        cat-and-mouse by design: hiding the native **Playback speed** row, and injecting
+        **Dual / Color highlight / Center word** into Subtitles/CC. See
+        [`docs/YOUTUBE-MONITOR.md`](https://github.com/dnl-gentile/yt-toolkit/blob/main/docs/YOUTUBE-MONITOR.md).
+
+        The captures below turn a vague report into a one-line fix. Please do not skip them.
+
+  - type: dropdown
+    id: signal
+    attributes:
+      label: Which tripwire fired
+      options:
+        - Dual / Color / Center appears in the root settings panel instead of Subtitles/CC
+        - Native "Playback speed" row is visible again
+        - WPM stays 0 until CC is toggled on
+        - Caption overlay is the wrong size or position
+        - No Distractions hides the wrong thing, or the account menu stops opening
+        - Our menu stacks on top of YouTube's settings menu
+        - Something else
+    validations:
+      required: true
+
+  - type: input
+    id: video
+    attributes:
+      label: Video URL
+    validations:
+      required: true
+
+  - type: textarea
+    id: menu_dump
+    attributes:
+      label: Settings menu text
+      description: "Run in the DevTools console on the watch page, with the gear menu open:"
+      placeholder: document.querySelector('.ytp-settings-menu')?.innerText
+      render: text
+    validations:
+      required: true
+
+  - type: textarea
+    id: timedtext
+    attributes:
+      label: timedtext request
+      description: DevTools → Network → filter `timedtext`. Paste the request URL and the first ~20 lines of the response.
+      render: text
+
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: Screenshot of the menu
+      description: Drag the image in here.
+
+  - type: input
+    id: version
+    attributes:
+      label: Extension version
+      placeholder: "1.6.1"
+    validations:
+      required: true
+
+  - type: input
+    id: locale
+    attributes:
+      label: YouTube interface language
+      description: Localized menu labels are a common cause. Which language is your YouTube UI in?
+      placeholder: English (US)
+    validations:
+      required: true

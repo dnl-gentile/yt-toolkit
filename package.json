@@ -3,13 +3,27 @@
   "private": true,
   "version": "1.6.2",
   "description": "YouTube Toolkit Chrome extension",
+  "license": "GPL-3.0-or-later",
+  "author": "Daniel Gentile",
+  "homepage": "https://github.com/dnl-gentile/yt-toolkit",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dnl-gentile/yt-toolkit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dnl-gentile/yt-toolkit/issues"
+  },
   "scripts": {
     "test": "node --test tests/*.test.js",
     "test:integration": "node --test tests/integration/*.test.js && playwright test --project=browser",
     "test:browser": "playwright test --project=browser",
     "test:visual": "playwright test --project=visual",
     "test:live": "playwright test tests/live/probe.spec.js --project=chromium",
-    "test:live:strict": "REQUIRE_WPM=1 playwright test tests/live/probe.spec.js --project=chromium"
+    "test:live:strict": "REQUIRE_WPM=1 playwright test tests/live/probe.spec.js --project=chromium",
+    "package": "bash scripts/package.sh",
+    "wiki:publish": "bash scripts/publish-wiki.sh",
+    "icons": "node scripts/build-icons.mjs",
+    "icons:check": "node scripts/check-icons.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.62.1"

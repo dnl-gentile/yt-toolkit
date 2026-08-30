@@ -1,7 +1,9 @@
 /*
-    YouTube No Distractions - A Chrome extension that removes distractions from YouTube.
+    YouTube Toolkit - A Chrome extension: No Distractions, constant WPM pace,
+    dual captions and word highlight.
 
     Copyright (C) 2025  Daniel Gentile
+    SPDX-License-Identifier: GPL-3.0-or-later
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -45,6 +47,7 @@ chrome.runtime.onInstalled.addListener((details) => {
     qt_vjs_secondaryTrack: "",
     qt_vjs_slotsChosen: false,
     qt_captionsEnabled: null,
+    qt_telemetry: true,
   };
   chrome.storage.sync.get(Object.keys(defaults), (s) => {
     const patch = {};

@@ -1,7 +1,8 @@
 /*
-    YouTube No Distractions - A Chrome extension that removes distractions from YouTube.
+    YouTube Toolkit - toggle injected into the quiet search page.
 
     Copyright (C) 2025  Daniel Gentile
+    SPDX-License-Identifier: GPL-3.0-or-later
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,6 +19,21 @@
 */
 
 (function() {
+  // Presence marker for the quiet page.
+  //
+  // The old yt-no-distractions-ext injects the same #quiet-mode-toggle-button here, so the
+  // button alone cannot tell the two extensions apart. The page reads this attribute to
+  // know the visitor is already on YouTube Toolkit and must not be shown an update notice.
+  // Remove it and the page starts nagging people who are already up to date.
+  try {
+    document.documentElement.setAttribute(
+      'data-yt-toolkit',
+      chrome.runtime.getManifest().version,
+    );
+  } catch {
+    // Advisory only — never block the toggle over it.
+  }
+
   // On search app, always use the white icon (quiet_mode_off.png)
   // The icon files are reversed in naming, so "off" icon shows "ON" state
   const doNotDisturbOffIconURL = chrome.runtime.getURL('icons/quiet_mode_off.png');

@@ -1,0 +1,47 @@
+name: Feature request
+description: Suggest something the extension should do.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please check the **non-goals** in
+        [`docs/SPEC.md` §2](https://github.com/dnl-gentile/yt-toolkit/blob/main/docs/SPEC.md)
+        first. The extension deliberately does not become a generic speed controller for other
+        sites, does not ship a settings panel over the player, and does not invent transcripts
+        where YouTube has none.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What are you trying to do that the extension makes hard? Describe the situation, not the solution.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What you have in mind
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What you tried instead
+      description: Existing settings, other extensions, manual workarounds.
+
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Where would it live
+      description: This project keeps settings in the player, not in a panel of its own.
+      options:
+        - Pace menu (behind the speedometer)
+        - YouTube's Subtitles/CC menu
+        - The masthead
+        - Options page
+        - Not sure
+    validations:
+      required: true

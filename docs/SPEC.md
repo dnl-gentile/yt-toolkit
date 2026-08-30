@@ -147,6 +147,12 @@ Supersession 2026-08-20 (generated-caption timing):
 
 - **WPM / lock / trim / clock / word highlight / center-word always use auto-generated (ASR) timedtext when it exists.** Uploaded same-language captions must not replace `QT.cues`. ASR has per-word `tOffsetMs`; uploaded lines only have cue-level times, so even-split “divisão de tempo” desyncs highlight and pace from speech. If the video has no ASR track, fall back to the first non-translation captionTrack. Switching the displayed caption to Arabic, Chinese, Auto-translate, etc. still must not change `playbackRate` or overlay WPM.
 
+Supersession 2026-08-26 (public repo launch):
+
+- The extension reports **anonymous, aggregate** usage to GA4. That is now **opt-out**: `qt_telemetry` in `chrome.storage.sync`, default `true`, with a switch on the extension options page. Every send passes through `Analytics.isEnabled()`; a missing or throwing storage layer means **no** reporting. What is collected is declared in `PRIVACY.md` and must stay in sync with `analytics.js`
+- The **options page** exists for settings that cannot live in the player. Playback and caption settings stay in the pace pill and the Subtitles/CC menu (§4, §7). Do not migrate them to the options page and do not duplicate them there
+- Licence is **GPL-3.0-or-later** (`LICENSE`). Source files carry an SPDX header. A change that would make the extension non-redistributable under that licence is out of scope
+
 Supersession 2026-08-20 (user session, prints on MrBeast *Last To Leave Mansion*):
 
 - **WPM / lock / trim / clock always use the video’s original language timedtext** (ASR / source). Switching the displayed caption to Arabic, Chinese, Auto-translate, etc. must not change `playbackRate` or the overlay WPM. Character scripts without spaces (zh, ja, th) would otherwise look like huge silence gaps and keep the player at trim-boost
@@ -165,7 +171,7 @@ Supersession 2026-08-20 (user session, prints on MrBeast *Last To Leave Mansion*
 - Store / card name: **YouTube Toolkit**
 - Folder / short name: `yt-toolkit`
 - Chrome MV3 unpacked extension, YouTube only (plus the quiet search app host)
-- Chrome card icon: red YouTube square + **white wrench** (Material `build`)
+- Chrome card icon: the **official YouTube badge silhouette** in red (lifted from the logo — not a rounded rectangle; the sides bulge) + a **white toolbox**, Material Symbols `home_repair_service`, **Rounded** weight. The source of truth is `icons/src/icon.svg`; the PNGs are rendered from it with `npm run icons` and must never be hand-edited. `npm run icons:check` fails if a PNG drifts from the vector, or if the glyph is too small to read at 16px — the size Chrome puts in the toolbar
 - Masthead No Distractions icon: original circle-with-slash, **not** the wrench
 
 ## 2. Non-goals
@@ -294,3 +300,26 @@ Allowed:
 10. Open a Short: exactly one pill matches the rendered top and height of the active native controls and is centered between them while volume is collapsed. It shows only `{target} WPM` with effective Pace Lock, otherwise only `{rate}x`. Hover volume: it becomes a right-anchored native-height speedometer square. Advancing to another Short moves the same pill, closes an open Toolkit menu, preserves CC, and does not add the lower clock
 11. Navigate A → B with CC off and a translated language saved: all user settings remain unchanged; B fetches its own original-language ASR, displays no caption, and still computes WPM/Lock/Trim from that ASR. A late translation, uploaded cue, or response from A cannot take ownership
 12. With Pace Lock off, a saved manual speed is applied to the replacement player. Lock/Trim may change the live rate while active, but turning Lock off returns to that saved speed
+
+## 11. Telemetry and privacy
+
+The extension sends anonymous, aggregate counts to a GA4 property over the Measurement Protocol. This section is the contract; `PRIVACY.md` is the same contract written for users and must not drift from it.
+
+- **Opt-out switch:** `qt_telemetry` in `chrome.storage.sync`. Default `true`. Surfaced on the options page. Absent key = on (a fresh profile before the install defaults land still counts as opted in)
+- **Single choke point:** everything goes through `Analytics.sendEvent`, which returns early on `isEnabled() === false`. No tracker may call `fetch` directly. If the storage layer is missing or throws, the answer is **no reporting**, not a fallback to on
+- **Events, in full:** `extension_installed` (with extension version), `toggle_no_distractions` (on/off), `homepage_redirected`, `video_page_visited`, `feature_usage` (feature name), `page_view`. Adding an event means editing `PRIVACY.md` in the same change
+- **Never collected:** video IDs, video titles, channel names, caption or transcript text, search terms, watch history, URLs, account identity, IP-derived profile beyond what GA4 does by default at the network layer
+- **Installation ID** is a random string in `chrome.storage.local`, generated on first send, resettable from the options page. It is not derived from any account, device or hardware value
+- Telemetry may never gate a feature. The extension must behave identically with the switch off
+
+### Options page
+
+- Exists for what cannot live in the player. Today: the telemetry switch and the installation-ID reset
+- Playback and caption settings stay in the pace pill (§4) and the Subtitles/CC menu (§7). Do not migrate them here, do not mirror them here — two sources of truth for the same toggle is the bug this rule prevents
+- Paint follows §3: flat dark surface, no frost, no hairline border, Roboto, YouTube's on-state switch colors
+
+## 12. Licence
+
+- **GPL-3.0-or-later.** `LICENSE` holds the full text; source files carry an `SPDX-License-Identifier` header
+- Continues `yt-no-distractions-ext`, same author, same licence
+- A change that would make the extension non-redistributable under that licence (a bundled non-free dependency, a proprietary service the extension cannot run without) is out of scope

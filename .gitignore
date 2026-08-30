@@ -1,5 +1,6 @@
 node_modules/
 output/
+dist/
 playwright-report/
 test-results/
 blob-report/
@@ -8,3 +9,6 @@ blob-report/
 
 # Playwright CLI scratch output
 .playwright-cli/
+
+# Wiki working clone created by scripts/publish-wiki.sh
+.wiki-publish/

@@ -1,0 +1,33 @@
+id: W-007
+slug: 007-public-launch
+title: "Public repo launch: licence, telemetry opt-out, README, wiki, community files"
+tier: M
+tier_rationale: >
+  User-visible surface (new options page) plus repository-level policy. Not L —
+  no WPM/lock/trim math is touched, and nothing here can freeze a YouTube tab.
+  Quality.md §3 path M — independent review of the diff.
+status: implemented
+paths_owned:
+  - LICENSE
+  - README.md
+  - PRIVACY.md
+  - SECURITY.md
+  - CONTRIBUTING.md
+  - CODE_OF_CONDUCT.md
+  - CHANGELOG.md
+  - analytics.js
+  - options.html
+  - options.css
+  - options.js
+  - package.json
+  - scripts/
+  - docs/wiki/
+  - docs/media/
+  - .github/ISSUE_TEMPLATE/
+  - .github/PULL_REQUEST_TEMPLATE.md
+  - tests/integration/telemetry.test.js
+  - docs/work/007-public-launch/
+notes: >
+  Touches background.js and manifest.json in two narrow places only:
+  the qt_telemetry install default, and the options_ui block. Both are
+  additive. No content script, no lib/, no CSS the player uses.
