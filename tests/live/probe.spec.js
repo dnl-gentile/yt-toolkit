@@ -610,16 +610,24 @@ test.describe("live YouTube probe", () => {
     console.log(`[probe] cluster after hidden ASR acquisition: ${label.trim()}`);
     if (timedtext.some((item) => item.bytes > 0)) {
       expect(wpm, `non-empty timedtext but cluster stayed ${label}`).toBeGreaterThan(0);
+    } else if (REQUIRE_WPM) {
+      expect(
+        wpm,
+        "strict live acceptance requires non-zero WPM even when the host returned empty timedtext",
+      ).toBeGreaterThan(0);
     } else {
-      console.log(
-        `[probe] host returned only empty timedtext bodies; CC invariant and request budget still enforced (${timedtext.length} requests)`,
+      /* Do NOT pass here. An all-empty response set is indistinguishable from
+         the very bug this assertion guards (the hidden pull never gets a body
+         because no pot was ever harvested), so a green result would be
+         evidence of nothing. Skipping keeps it out of any "N/N passed" count. */
+      test.info().annotations.push({
+        type: "unproven",
+        description: `host returned only empty timedtext bodies over ${timedtext.length} requests; WPM acquisition is NOT proven by this run. Re-run with REQUIRE_WPM=1 in a signed-in Chrome to make it a hard gate.`,
+      });
+      test.skip(
+        true,
+        "WPM acquisition unproven: every timedtext body was empty (see the unproven annotation)",
       );
-      if (REQUIRE_WPM) {
-        expect(
-          wpm,
-          "strict live acceptance requires non-zero WPM even when the host returned empty timedtext",
-        ).toBeGreaterThan(0);
-      }
     }
 
     const player = page.locator(SELECTORS.moviePlayer);
@@ -1144,9 +1152,13 @@ test.describe("live YouTube probe", () => {
     if (timedtext.some((item) => item.bytes > 0) || REQUIRE_WPM) {
       expect(wpm, `Shorts cluster stayed ${label}`).toBeGreaterThan(0);
     } else {
-      console.log(
-        `[probe] Shorts host returned only empty timedtext bodies; geometry, CC invariant and request budget passed (${timedtext.length} requests)`,
-      );
+      /* Geometry, CC invariance and the request budget above are proven; the
+         WPM claim is not. Record that rather than letting the run read green
+         on a claim it did not test. */
+      test.info().annotations.push({
+        type: "unproven",
+        description: `Shorts: geometry, CC invariance and request budget passed, but every timedtext body was empty over ${timedtext.length} requests, so WPM acquisition is NOT proven.`,
+      });
     }
 
     const firstPath = new URL(page.url()).pathname;
