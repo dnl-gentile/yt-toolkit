@@ -506,6 +506,64 @@ test("Shorts native Captions sheet gets only Highlight and Center without touchi
   ).toBe(true);
 });
 
+/*
+ * BLIND SPOT: every fixture in this suite writes <yt-list-item-view-model> as
+ * an UNDEFINED custom element — `customElements.define` appears nowhere under
+ * tests/. An undefined tag is an inert HTMLElement, so anything we put inside
+ * one stays put. On real YouTube that element IS defined, and defined custom
+ * elements run a lifecycle when inserted.
+ *
+ * makeShortsToggle (content/yt-menu-patch.js:742) builds our row with
+ * `document.createElement(offItem.tagName)` — i.e. it instantiates YouTube's
+ * own component — and then calls `row.replaceChildren(content)`. Measured
+ * against a minimal view-model that renders its own light DOM on connect:
+ *
+ *   undefined element -> our label survives, textContent "Color highlight"
+ *   defined element   -> our label is GONE, textContent "native"
+ *
+ * So the rows appear in the DOM with the right data-qt-cap attributes — which
+ * is all the existing assertions check — while showing YouTube's content
+ * instead of ours. The suite cannot currently tell the two apart.
+ *
+ * Marked test.fail() because it documents a real defect rather than guarding a
+ * fixed one: if a change makes it pass, Playwright reports "expected to fail
+ * but passed" and this annotation should be removed along with this comment.
+ * The durable fix is to stop instantiating a host component at all — build a
+ * neutral element and carry the native className/style across, which
+ * makeShortsToggle already does.
+ */
+test.fail(
+  "Shorts rows keep their own content when the host element is a real custom element",
+  async ({ page }) => {
+    /* Define the element the way YouTube does. addInitScript runs before any
+       page script, so the definition is in place by the time our patch calls
+       document.createElement on that tag. */
+    await page.addInitScript(() => {
+      class ListItemViewModel extends HTMLElement {
+        connectedCallback() {
+          if (this.dataset.nativeRow) return; /* leave the seeded rows alone */
+          this.replaceChildren(
+            Object.assign(document.createElement("label"), { textContent: "native" }),
+          );
+        }
+      }
+      customElements.define("yt-list-item-view-model", ListItemViewModel);
+    });
+
+    await bootShortsCaptionMenu(page, { asr: false });
+    await page.evaluate(() => document.dispatchEvent(new Event("qt-toolkit-frame")));
+
+    const rows = page.locator("#shorts-caption-menu > [data-qt-cap]");
+    await expect(rows).toHaveCount(2);
+    expect(
+      await rows.evaluateAll((nodes) =>
+        nodes.map((node) => node.querySelector(".qt-shorts-cap-label")?.textContent || ""),
+      ),
+      "the injected rows lost their labels to the host element's own render",
+    ).toEqual(["Color highlight", "Center word"]);
+  },
+);
+
 test("closed Shorts frames do not rediscover document menus", async ({ page }) => {
   await bootShortsCaptionMenu(page, { asr: true });
   await page.evaluate(() => {

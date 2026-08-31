@@ -29,6 +29,29 @@ const UPLOADED_CUES = [
   { start: 5, end: 9, text: "five six seven eight" },
 ];
 
+/*
+ * The pace pill is painted by a 280 ms interval in content/pace.js, so its
+ * label lands some time AFTER boot() returns — boot ends on a fixed 400 ms
+ * sleep, which usually covers a tick and sometimes does not. Reading the label
+ * with a one-shot page.evaluate is therefore a race, and it is the whole
+ * reason two tests in this file failed intermittently on unchanged code
+ * (no-asr-mode:296 and :309, once each across three clean full-suite runs,
+ * while passing 3/3 in isolation).
+ *
+ * Wait for the label to actually say what this test is about, then assert the
+ * rest against that settled value.
+ */
+async function pillLabel(page, contains) {
+  const read = () =>
+    page.evaluate(
+      () => document.querySelector("#qt-cluster .qt-cluster-label")?.textContent || "",
+    );
+  await expect.poll(read, {
+    message: `pace pill never showed "${contains}"`,
+  }).toContain(contains);
+  return read();
+}
+
 async function boot(page, { prefs = {}, cues = UPLOADED_CUES, asr = false } = {}) {
   await page.route("http://yt.test/**", (route) =>
     route.fulfill({ contentType: "text/html", body: PLAYER }),
@@ -295,12 +318,9 @@ test("with ASR present the controls are live", async ({ page }) => {
 
 test("the pill marks WPM unavailable instead of inventing a number", async ({ page }) => {
   await boot(page);
-  const text = await page.evaluate(
-    () => document.querySelector("#qt-cluster .qt-cluster-label")?.textContent || "",
-  );
+  const text = await pillLabel(page, "— WPM");
   /* Not "0 WPM" (that means a real pause) and not the Lock target (that would
      present the goal as a measurement). */
-  expect(text).toContain("— WPM");
   expect(text).not.toContain("0 WPM");
   expect(text).not.toContain("400 WPM");
   expect(text, "the manual speed is still shown").toContain("1.75x");
@@ -316,10 +336,7 @@ test("with ASR the pill reports the Lock target again", async ({ page }) => {
       ] },
     ],
   });
-  const text = await page.evaluate(
-    () => document.querySelector("#qt-cluster .qt-cluster-label")?.textContent || "",
-  );
-  expect(text).toContain("400 WPM");
+  const text = await pillLabel(page, "400 WPM");
   expect(text).not.toContain("— WPM");
 });
 
