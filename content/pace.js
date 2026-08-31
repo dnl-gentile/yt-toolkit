@@ -1150,6 +1150,25 @@
     );
   }
 
+  /* Shorts has no .ytp-settings-menu anywhere. Its native surface is a
+     document-level <yt-sheet-view-model>, and it is a different, less
+     transparent paint than the watch menu. Without this, the lookup below
+     finds nothing on a Short, nativeMenuSkin stays null, and our menu wears
+     the watch-shaped default from styles.css against a sheet that does not
+     match it.
+
+     Scoped deliberately: only on a Short, only a sheet that is actually
+     rendered, and never our own menu. If no sheet is open we return null and
+     the existing "keep the last valid paint" logic applies, exactly as it does
+     when the watch popup is dismissed. */
+  function shortsSheetPaintSource() {
+    if (!isShortsPage()) return null;
+    const sheets = Array.from(
+      document.querySelectorAll("yt-sheet-view-model, tp-yt-paper-dialog[opened]"),
+    ).filter((sheet) => sheet.id !== "qt-speed-menu" && !sheet.closest("#qt-speed-menu"));
+    return sheets.find(nativeMenuIsRendered) || null;
+  }
+
   function nativeSettingsMenuForPlayer(player, includeHidden) {
     if (!player || !player.querySelectorAll) return null;
     const menus = Array.from(
@@ -1287,10 +1306,14 @@
       return;
     }
     const playerChanged = player !== nativeMenuPlayer;
-    const menu = nativeSettingsMenuForPlayer(
-      player,
-      playerChanged || !nativeMenuSkin,
-    );
+    /* On Shorts the paint source is the sheet, not a settings menu — see
+       shortsSheetPaintSource. Kept to this one call site on purpose: the other
+       caller of nativeSettingsMenuForPlayer is ytSettingsOpen(), and a sheet
+       must not count as "the native settings menu is open" or the no-stacking
+       rule in SPEC §3 suppresses our own menu instead of YouTube's. */
+    const menu =
+      shortsSheetPaintSource() ||
+      nativeSettingsMenuForPlayer(player, playerChanged || !nativeMenuSkin);
     const skin = readNativeMenuSkin(nativeMenuPaintSource(menu));
     nativeMenuPlayer = player;
     nativeMenuNextSampleAt = now + NATIVE_MENU_SAMPLE_MS;

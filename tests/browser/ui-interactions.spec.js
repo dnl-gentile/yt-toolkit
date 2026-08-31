@@ -2812,3 +2812,81 @@ test("Shorts fits one Toolkit cluster into the responsive native control lane", 
   }, cueBody);
   await expect.poll(() => page.evaluate(() => window.QuietTube.cues.length)).toBeGreaterThan(0);
 });
+
+/*
+ * The Toolkit pace menu must be painted from the surface it actually sits on.
+ *
+ * On /watch that surface is `.ytp-settings-menu`, and the test above proves we
+ * copy it exactly. On /shorts there is no `.ytp-settings-menu` at all — the
+ * native surface is a document-level `yt-sheet-view-model`, which is a
+ * different, less transparent paint. nativeSettingsMenuForPlayer only searches
+ * `player.querySelectorAll(".ytp-popup.ytp-settings-menu, .ytp-settings-menu")`,
+ * so on a Short it finds nothing, nativeMenuSkin stays null, and our menu
+ * silently falls back to the /watch-shaped default in styles.css
+ * (rgba(28,28,28,0.9), no backdrop filter).
+ *
+ * That mismatch is user-visible: the Toolkit menu looks see-through against a
+ * sheet that is not.
+ */
+test("the Shorts pace menu is painted from the Shorts sheet, not the watch default", async ({
+  page,
+}) => {
+  await page.route("http://yt.test/**", (route) =>
+    route.fulfill({
+      contentType: "text/html",
+      body: `<style>
+        body{margin:0;background:#000}
+        .html5-video-player{position:relative;width:452px;height:804px;background:#181818}
+        ytd-shorts-player-controls{position:absolute;inset:0;display:flex}
+        #left-controls,#right-controls{position:absolute;top:16px;height:48px;display:flex}
+        #left-controls{left:16px;width:116px}
+        #right-controls{right:16px;width:144px}
+        /* A deliberately distinctive sheet: opaque, rounded, blurred — none of
+           it matching the styles.css fallback. */
+        #shorts-sheet{
+          position:fixed;left:0;bottom:0;width:452px;height:300px;
+          background-color:rgb(40,40,40);border-radius:12px;
+          backdrop-filter:blur(6px);
+        }
+      </style>
+      <ytd-reel-video-renderer is-active aria-hidden="false">
+        <div id="shorts-player" class="html5-video-player">
+          <video class="html5-main-video"></video>
+          <ytd-shorts-player-controls>
+            <div id="left-controls"></div><div id="right-controls"></div>
+          </ytd-shorts-player-controls>
+        </div>
+      </ytd-reel-video-renderer>
+      <yt-sheet-view-model id="shorts-sheet"><h2>Captions</h2></yt-sheet-view-model>`,
+    }),
+  );
+  await page.goto("http://yt.test/shorts/PAINT1");
+  await installChromeStub(page, { qt_playbackRate: 1, qt_paceLock: false });
+  await page.addStyleTag({ path: path.join(ROOT, "styles.css") });
+  for (const file of ["lib/timedtext.js", "lib/wpm.js", "lib/clock.js", "content/pace.js"])
+    await page.addScriptTag({ path: path.join(ROOT, file) });
+
+  await page.locator("#qt-cluster .qt-chrome-btn").click();
+  await expect(page.locator("#qt-speed-menu")).toBeVisible();
+
+  const paint = await page.evaluate(() => {
+    const read = (el) => {
+      const style = getComputedStyle(el);
+      return {
+        backgroundColor: style.backgroundColor,
+        borderRadius: style.borderRadius,
+        backdropFilter: style.backdropFilter || style.webkitBackdropFilter || "none",
+      };
+    };
+    return {
+      sheet: read(document.getElementById("shorts-sheet")),
+      toolkit: read(document.getElementById("qt-speed-menu")),
+    };
+  });
+
+  expect(
+    paint.toolkit.backgroundColor,
+    "the Shorts menu is still wearing the watch-menu fallback",
+  ).toBe(paint.sheet.backgroundColor);
+  expect(paint.toolkit.backdropFilter).toBe(paint.sheet.backdropFilter);
+});
