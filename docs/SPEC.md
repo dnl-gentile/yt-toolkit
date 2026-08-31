@@ -147,6 +147,12 @@ Supersession 2026-08-20 (generated-caption timing):
 
 - **WPM / lock / trim / clock / word highlight / center-word always use auto-generated (ASR) timedtext when it exists.** Uploaded same-language captions must not replace `QT.cues`. ASR has per-word `tOffsetMs`; uploaded lines only have cue-level times, so even-split “divisão de tempo” desyncs highlight and pace from speech. If the video has no ASR track, fall back to the first non-translation captionTrack. Switching the displayed caption to Arabic, Chinese, Auto-translate, etc. still must not change `playbackRate` or overlay WPM.
 
+Supersession 2026-08-31 (user decision, correcting §2 and §9):
+
+- **Playback control on other players is in scope.** §2's non-goal "do not become a generic video-speed controller for other sites" is superseded: an **allow-listed** third-party player may receive the Toolkit playback controls, as `https://tvweb3.unip.br/*` does today. Allow-listed is the operative word — this is not a blanket `<all_urls>` speed controller, each host is added deliberately and appears in `manifest.json` and `PRIVACY.md`. No Distractions, the YouTube menu patches and ASR acquisition stay YouTube-only
+- **Captions run on Shorts.** §9 previously read "captions remain `/watch` only", which contradicted both the shipped code and the 2026-08-29 supersession in this same file. Colour highlight and Center word render on `/shorts/:id`; Dual does not, because a Short has room for one line
+- The Shorts pace pill shows **exactly one value** — the target WPM under effective Pace Lock, otherwise the rate — because the lane has no room for both. This was already correct; it is written here so it is not "tidied" into the two-value `/watch` format later
+
 Supersession 2026-08-26 (public repo launch):
 
 - The extension reports **anonymous, aggregate** usage to GA4. That is now **opt-out**: `qt_telemetry` in `chrome.storage.sync`, default `true`, with a switch on the extension options page. Every send passes through `Analytics.isEnabled()`; a missing or throwing storage layer means **no** reporting. What is collected is declared in `PRIVACY.md` and must stay in sync with `analytics.js`
@@ -284,7 +290,8 @@ Allowed:
 
 - One observer on `#movie_player` / `ytd-masthead` / `ytd-watch-flexy` as they appear
 - `yt-navigate-finish` to reset state and **disconnect** stale observers
-- One rAF/interval pair for pace on `/watch` and `/shorts/:id` (captions remain `/watch` only), paused when the tab is hidden
+- One rAF/interval pair for pace and captions on `/watch` and `/shorts/:id`, paused when the tab is hidden
+- **On `/shorts/:id` the reel LIST is the observation root, not each reel.** A Short renders several sibling `ytd-reel-video-renderer` nodes at once; observing each one is how the idle budget gets blown while every individual observer still looks reasonable
 
 ## 10. Acceptance (must be true on real YouTube players)
 

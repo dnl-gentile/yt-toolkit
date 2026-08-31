@@ -379,10 +379,13 @@
     if (isShortsPage()) {
       const reel = active.closest?.("ytd-reel-video-renderer");
       if (!reel) return [active];
-      const siblings = Array.from(reel.parentElement?.children || []).filter(
-        (node) => node.matches?.("ytd-reel-video-renderer"),
-      );
-      return siblings.length ? siblings : [reel];
+      /* The reel LIST, not each reel. A Short renders several siblings at
+         once, so observing each one scales the idle cost with however many
+         YouTube decides to keep mounted — and it is watched with subtree:true.
+         The parent sees every child add/remove and, with subtree, every
+         is-active flip inside them, in one root. (docs/SPEC.md §9.) */
+      const list = reel.parentElement;
+      return list ? [list] : [reel];
     }
     return [
       active.closest?.("ytd-watch-flexy") ||
@@ -409,6 +412,16 @@
       if (!relevant) return;
       invalidatePlayerCache();
       syncTicks();
+      /* One observer, two consumers. yt-menu-patch.js had a byte-for-byte
+         equivalent of this observer on the same roots; together they put the
+         idle count over the budget in docs/QUALITY.md §2. It now listens for
+         this instead. Dispatched after our own invalidation so a listener that
+         reads player state sees it already refreshed. */
+      try {
+        document.dispatchEvent(new CustomEvent("qt-player-lifecycle"));
+      } catch {
+        /* a listener throwing must not take the caption loop down */
+      }
     });
     playerLifecycleRoots = roots;
     roots.forEach((root) => {

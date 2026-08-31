@@ -1001,3 +1001,103 @@ test("same-video player replacement restores explicit CC-on once after the start
     "CC-off must not click a late replacement button",
   ).toBe("true");
 });
+
+/*
+ * Idle observer budget on Shorts (docs/QUALITY.md §2: "≤ 2 MutationObserver
+ * instances attached at idle", a budget that names /shorts/:id explicitly).
+ *
+ * A Short renders several sibling ytd-reel-video-renderer nodes at once.
+ * captions.js and yt-menu-patch.js each grew a player-lifecycle observer with
+ * the same roots and the same options, and each observed EVERY sibling reel
+ * with subtree:true. Measured on a three-reel page: 3 instances over 7 roots,
+ * six full reel subtrees watched in duplicate — while each observer looks
+ * perfectly reasonable read on its own.
+ *
+ * Two things are asserted, because the instance count alone hides the cost:
+ * how many observers are attached, and how many roots they cover.
+ */
+test("Shorts keeps the idle observer budget", async ({ page }) => {
+  await page.route("http://yt.test/**", (route) =>
+    route.fulfill({
+      contentType: "text/html",
+      body: `<style>.html5-video-player{width:452px;height:804px}</style>
+      <div id="reel-list">
+        <ytd-reel-video-renderer is-active aria-hidden="false">
+          <div id="shorts-player" class="html5-video-player">
+            <video class="html5-main-video"></video>
+            <ytd-shorts-player-controls>
+              <div id="left-controls"></div><div id="right-controls"></div>
+            </ytd-shorts-player-controls>
+          </div>
+        </ytd-reel-video-renderer>
+        <ytd-reel-video-renderer aria-hidden="true">
+          <div class="html5-video-player"><video></video></div>
+        </ytd-reel-video-renderer>
+        <ytd-reel-video-renderer aria-hidden="true">
+          <div class="html5-video-player"><video></video></div>
+        </ytd-reel-video-renderer>
+      </div>`,
+    }),
+  );
+
+  await page.addInitScript(() => {
+    const Native = window.MutationObserver;
+    window.__obs = [];
+    window.MutationObserver = class extends Native {
+      constructor(cb) {
+        super(cb);
+        this.__roots = [];
+        this.__live = false;
+        window.__obs.push(this);
+      }
+      observe(root, opts) {
+        this.__roots.push({ tag: root.tagName || String(root), subtree: !!(opts && opts.subtree) });
+        this.__live = true;
+        return super.observe(root, opts);
+      }
+      disconnect() {
+        this.__live = false;
+        this.__roots = [];
+        return super.disconnect();
+      }
+    };
+  });
+
+  await page.goto("http://yt.test/shorts/OBSBUDGET");
+  await installChromeStub(page, {});
+  for (const file of [
+    "lib/timedtext.js",
+    "lib/wpm.js",
+    "lib/clock.js",
+    "lib/dual-lang.js",
+    "content/pace.js",
+    "content/captions.js",
+    "content/yt-menu-patch.js",
+  ])
+    await page.addScriptTag({ path: path.join(ROOT, file) });
+
+  /* Long enough for every watchdog to have run and settled. */
+  await page.waitForTimeout(2500);
+
+  const budget = await page.evaluate(() => {
+    const live = window.__obs.filter((o) => o.__live);
+    return {
+      instances: live.length,
+      roots: live.reduce((n, o) => n + o.__roots.length, 0),
+      perReelSubtrees: live.reduce(
+        (n, o) =>
+          n + o.__roots.filter((r) => r.tag === "YTD-REEL-VIDEO-RENDERER" && r.subtree).length,
+        0,
+      ),
+    };
+  });
+
+  expect(
+    budget.instances,
+    `docs/QUALITY.md §2 allows 2 observers at idle; found ${budget.instances} over ${budget.roots} roots`,
+  ).toBeLessThanOrEqual(2);
+  expect(
+    budget.perReelSubtrees,
+    "observe the reel list once, not each sibling reel with subtree:true",
+  ).toBe(0);
+});

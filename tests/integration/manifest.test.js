@@ -44,17 +44,37 @@ test("idle observer and pace/captions scheduler budgets stay bounded", () => {
   const menu = fs.readFileSync(path.join(root, "content/yt-menu-patch.js"), "utf8");
   const pace = fs.readFileSync(path.join(root, "content/pace.js"), "utf8");
   const captions = fs.readFileSync(path.join(root, "content/captions.js"), "utf8");
+  /* The menu used to carry a second observer that was a byte-for-byte copy of
+     the one in captions.js, on the same roots. On Shorts each watched every
+     sibling reel with subtree:true, which measured 3 instances over 7 roots at
+     idle against a budget of 2. There is now one owner that broadcasts
+     qt-player-lifecycle, and the menu listens.
+
+     These are source-shape checks and they only pin the architecture. The
+     behavioural guard is "Shorts keeps the idle observer budget" in
+     tests/browser/menu-flicker.spec.js, which counts what is actually attached
+     on a live three-reel page — that is the one that would catch a regression
+     this file cannot see. */
   assert.equal(
     (menu.match(/new MutationObserver/g) || []).length,
-    2,
-    "menu may observe only the open menu and the active player's local lifecycle",
+    1,
+    "menu may observe only the open menu; player lifecycle is broadcast to it",
+  );
+  assert.match(
+    menu,
+    /addEventListener\("qt-player-lifecycle"/,
+    "menu must consume the shared lifecycle event rather than re-observing",
   );
   const broadRootObserver =
     /observe\(\s*document\.(?:body|documentElement)\s*,\s*\{[\s\S]{0,220}?subtree\s*:\s*true/;
   assert.doesNotMatch(menu, broadRootObserver);
   assert.doesNotMatch(captions, broadRootObserver);
-  assert.match(menu, /activePlayerObserver\.observe\(root,/);
   assert.match(captions, /playerLifecycleObserver\.observe\(root,/);
+  assert.match(
+    captions,
+    /dispatchEvent\(new CustomEvent\("qt-player-lifecycle"\)\)/,
+    "captions owns the lifecycle observer and must broadcast it",
+  );
   assert.equal(
     (pace.match(/setInterval\s*\(/g) || []).length,
     1,

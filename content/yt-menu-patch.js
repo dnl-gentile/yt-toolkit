@@ -425,14 +425,11 @@
       return activePlayerCache.player;
     const resolved = isShortsPage() ? resolveShortsPlayer() : resolveWatchPlayer();
     activePlayerCache = { key, player: resolved || null };
-    observeActivePlayerLifecycle(resolved);
     return resolved;
   }
 
   const ACTIVE_PLAYER_NODE_SELECTOR =
     "ytd-reel-video-renderer, ytd-player, #movie_player, #shorts-player";
-  let activePlayerObserver = null;
-  let activePlayerObserverRoots = [];
   function activePlayerLifecycleNode(node) {
     if (!node || node.nodeType !== 1) return false;
     return (
@@ -440,53 +437,15 @@
       !!node.querySelector?.(ACTIVE_PLAYER_NODE_SELECTOR)
     );
   }
-  function activePlayerLifecycleRoots(player) {
-    if (!player) return [];
-    if (isShortsPage()) {
-      const reel = player.closest?.("ytd-reel-video-renderer");
-      if (!reel) return [player];
-      const siblings = Array.from(reel.parentElement?.children || []).filter(
-        (node) => node.matches?.("ytd-reel-video-renderer"),
-      );
-      return siblings.length ? siblings : [reel];
-    }
-    return [
-      player.closest?.("ytd-watch-flexy") ||
-        player.closest?.("ytd-player") ||
-        player,
-    ];
-  }
-
-  function observeActivePlayerLifecycle(player) {
-    const roots = activePlayerLifecycleRoots(player);
-    if (
-      roots.length === activePlayerObserverRoots.length &&
-      roots.every((root, index) => root === activePlayerObserverRoots[index])
-    )
-      return;
-    if (activePlayerObserver) activePlayerObserver.disconnect();
-    activePlayerObserver = null;
-    activePlayerObserverRoots = roots;
-    if (!roots.length) return;
-    activePlayerObserver = new MutationObserver((records) => {
-      const relevant = records.some((record) => {
-        if (record.type === "attributes")
-          return record.target?.matches?.("ytd-reel-video-renderer") || false;
-        return [...record.addedNodes, ...record.removedNodes].some(
-          activePlayerLifecycleNode,
-        );
-      });
-      if (relevant) invalidateActivePlayer();
-    });
-    roots.forEach((root) => {
-      activePlayerObserver.observe(root, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        attributeFilter: ["is-active", "active", "aria-hidden"],
-      });
-    });
-  }
+  /* The player-lifecycle watch lives in content/captions.js and is broadcast as
+     `qt-player-lifecycle`. This file used to run a byte-for-byte equivalent of
+     that observer on the same roots with the same options; on Shorts each of
+     them watched EVERY sibling reel with subtree:true, which put the idle count
+     over the budget in docs/QUALITY.md §2 (measured: 3 instances, 7 roots, six
+     reel subtrees in duplicate). One observer, two consumers. */
+  document.addEventListener("qt-player-lifecycle", () => {
+    invalidateActivePlayer();
+  });
 
   function ccButton() {
     const player = activePlayer();
