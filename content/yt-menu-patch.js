@@ -739,8 +739,17 @@
 
   function makeShortsToggle(key, label, on, offItem) {
     const blocked = needsAsr(key) && !asrRhythm();
-    const tag = offItem?.tagName?.toLowerCase() || "div";
-    const row = document.createElement(tag);
+    /* Deliberately a plain element, NOT offItem.tagName.
+       The native Off row is a <yt-list-item-view-model>, and that is a DEFINED
+       custom element on real YouTube. Instantiating it would run YouTube's own
+       lifecycle, whose render replaces the children we put in — measured: with
+       the element defined, our label is gone and the row shows the host's own
+       content instead. Every fixture writes that tag UNDEFINED (there is no
+       customElements.define anywhere under tests/), where it is inert and the
+       substitution is invisible, which is why this survived the suite.
+       Appearance is carried by the copied className and inline style below,
+       plus display:flex in styles-toggles.css — none of it is tag-dependent. */
+    const row = document.createElement("div");
     if (offItem?.className && typeof offItem.className === "string")
       row.className = offItem.className;
     if (offItem?.style?.cssText) row.style.cssText = offItem.style.cssText;

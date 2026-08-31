@@ -523,16 +523,19 @@ test("Shorts native Captions sheet gets only Highlight and Center without touchi
  *
  * So the rows appear in the DOM with the right data-qt-cap attributes — which
  * is all the existing assertions check — while showing YouTube's content
- * instead of ours. The suite cannot currently tell the two apart.
+ * The rows appeared with the right data-qt-cap attributes — all the existing
+ * assertions check — while showing YouTube’s content instead of ours, and no
+ * fixture could tell the two apart.
  *
- * Marked test.fail() because it documents a real defect rather than guarding a
- * fixed one: if a change makes it pass, Playwright reports "expected to fail
- * but passed" and this annotation should be removed along with this comment.
- * The durable fix is to stop instantiating a host component at all — build a
- * neutral element and carry the native className/style across, which
- * makeShortsToggle already does.
+ * Fixed by building a plain element instead of the host component, in
+ * makeShortsToggle. Appearance survives because it comes from the copied
+ * className/style plus display:flex in styles-toggles.css, none of which is
+ * tag-dependent — the geometry-and-paint assertions above still pass unchanged.
+ *
+ * This test now guards that fix: it goes red again the moment anything returns
+ * to instantiating a defined host element and letting it own our children.
  */
-test.fail(
+test(
   "Shorts rows keep their own content when the host element is a real custom element",
   async ({ page }) => {
     /* Define the element the way YouTube does. addInitScript runs before any
