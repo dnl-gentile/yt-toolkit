@@ -141,7 +141,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       // Track toggle event
       analytics.trackToggle(newState);
 
-      // Save the new state
+      /* Write BOTH areas, because lib/prefs.js resolves reads as
+         Object.assign({}, sync, local) — local wins — and the install defaults
+         above seed noDistractionsEnabled into local too. A sync-only write is
+         therefore invisible: the stale value left in local outranks it on the
+         next page load and the setting turns itself back on. */
+      chrome.storage.local.set({ noDistractionsEnabled: newState });
       chrome.storage.sync.set({ noDistractionsEnabled: newState }, () => {
         
         // Check if we're on a video page
