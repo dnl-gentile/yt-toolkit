@@ -157,6 +157,32 @@
     return out;
   }
 
+  /* Second source for the proof-of-origin token.
+     noteSignedTimedtext can only harvest one by observing a timedtext request
+     YouTube itself makes — and with CC off it makes none, which is why the
+     hidden pull used to get 200-and-empty until the user toggled captions.
+     The player response carries the same class of token directly, so read it
+     rather than waiting to overhear one. Costs no request and touches no
+     caption state, so SPEC §5 invariant 8 and SPEC §7 both still hold. */
+  function playerProofToken() {
+    try {
+      const token = playerResponse()?.serviceIntegrityDimensions?.poToken;
+      return typeof token === "string" && token ? token : "";
+    } catch {
+      return "";
+    }
+  }
+
+  function withPlayerProof(url) {
+    if (!url || /[?&]pot=/i.test(String(url))) return url;
+    const token = playerProofToken();
+    if (!token) return url;
+    /* Encoded here, unlike mergeAuthParams: that copies an already-encoded
+       value out of a URL, this one is a raw string and '+' must survive. */
+    const out = String(url);
+    return out + (out.includes("?") ? "&" : "?") + "pot=" + encodeURIComponent(token);
+  }
+
   function isOriginalPayload(url, lang) {
     const meta = langFromUrl(url);
     const key = String(lang || "").toLowerCase();
@@ -419,6 +445,10 @@
     };
     let primary = forceOriginal ? stripTlang(url) : url;
     if (lastSignedTimedtext) primary = mergeAuthParams(primary, lastSignedTimedtext);
+    /* An observed token wins — it is known good for this exact session. The
+       player-response token only fills the gap when nothing has been overheard,
+       which is precisely the CC-off case. */
+    primary = withPlayerProof(primary);
     add(withJson3(primary, keep));
     add(primary);
     let i = 0;

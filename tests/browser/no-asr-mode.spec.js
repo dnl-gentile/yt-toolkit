@@ -42,14 +42,23 @@ const UPLOADED_CUES = [
  * rest against that settled value.
  */
 async function pillLabel(page, contains) {
-  const read = () =>
-    page.evaluate(
-      () => document.querySelector("#qt-cluster .qt-cluster-label")?.textContent || "",
-    );
-  await expect.poll(read, {
-    message: `pace pill never showed "${contains}"`,
-  }).toContain(contains);
-  return read();
+  /* Capture the value that satisfied the poll and return THAT. Reading again
+     afterwards re-opens the same race the poll just closed: the 280 ms tick can
+     repaint between the check and the second read, so the caller would assert
+     against a different string than the one that passed. */
+  let settled = "";
+  await expect
+    .poll(
+      async () => {
+        settled = await page.evaluate(
+          () => document.querySelector("#qt-cluster .qt-cluster-label")?.textContent || "",
+        );
+        return settled;
+      },
+      { message: `pace pill never showed "${contains}"` },
+    )
+    .toContain(contains);
+  return settled;
 }
 
 async function boot(page, { prefs = {}, cues = UPLOADED_CUES, asr = false } = {}) {

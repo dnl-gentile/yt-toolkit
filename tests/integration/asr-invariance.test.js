@@ -33,6 +33,7 @@ function harness(responseText, options = {}) {
     name: { simpleText: "English (auto-generated)" },
   };
   const playerResponse = {
+    ...(options.playerResponseExtra || {}),
     videoDetails: { videoId },
     captions: {
       playerCaptionsTracklistRenderer: {
@@ -80,11 +81,17 @@ function harness(responseText, options = {}) {
       (listeners[type] || (listeners[type] = [])).push(fn);
     },
     fetch(url) {
-      fetches.push(String(url));
+      const raw = String(url);
+      fetches.push(raw);
       if (options.deferFetch) {
         return new Promise((resolve) => pendingFetches.push({ resolve }));
       }
-      return Promise.resolve(response(responseText));
+      /* A function lets a test model an endpoint that answers differently
+         depending on the request — e.g. one that returns an empty body unless
+         the caller proves origin. */
+      return Promise.resolve(
+        response(typeof responseText === "function" ? responseText(raw) : responseText),
+      );
     },
   };
   windowObj.window = windowObj;
@@ -228,4 +235,57 @@ test("only the MAIN world inject fetches timedtext", () => {
       `${file} must not call fetch() directly`,
     );
   }
+});
+
+/*
+ * The reported bug: WPM and Center word stay dead until you toggle CC off and
+ * back on.
+ *
+ * Why it happens. YouTube's timedtext endpoint answers with an empty body
+ * unless the request proves origin with a `pot` token. The only place this
+ * extension ever harvests one is noteSignedTimedtext, and that runs solely
+ * from onPlayerTimedtext — i.e. only from a timedtext request YOUTUBE itself
+ * makes. With CC off YouTube makes none, so the hidden pull gets 200-and-empty
+ * forever. Toggling CC makes the player fetch captions, we observe the token,
+ * and the engine springs to life — exactly the workaround the user found.
+ *
+ * The token is not only obtainable by eavesdropping. The player response
+ * carries it in serviceIntegrityDimensions.poToken, which this extension never
+ * read. Using it costs no extra request and touches no caption state, so it
+ * respects both SPEC §5 invariant 8 (acquire without toggling CC) and SPEC §7
+ * (never force captions on).
+ */
+test("a proof token in the player response arms WPM without touching CC", async () => {
+  const cues = JSON.stringify({
+    events: [
+      {
+        tStartMs: 0,
+        dDurationMs: 2000,
+        segs: [{ utf8: "hello", tOffsetMs: 0 }, { utf8: " there", tOffsetMs: 600 }],
+      },
+    ],
+  });
+
+  const h = harness(
+    /* The endpoint only answers when origin is proven. */
+    (url) => (/[?&]pot=PLAYERPOT\b/.test(url) ? cues : "<timedtext></timedtext>"),
+    { playerResponseExtra: { serviceIntegrityDimensions: { poToken: "PLAYERPOT" } } },
+  );
+
+  for (let i = 0; i < 40; i++) await tick();
+
+  assert.ok(
+    h.fetches.some((url) => /[?&]pot=PLAYERPOT\b/.test(url)),
+    `no request carried the player-response proof token: ${JSON.stringify(h.fetches)}`,
+  );
+  assert.ok(
+    h.posts.some((post) => post.type === "QT_TIMEDTEXT"),
+    "the engine never armed, so WPM and Center word would stay dead until CC is toggled",
+  );
+  assert.equal(
+    h.setOptions.length,
+    0,
+    "acquiring the track must not select or enable a caption track",
+  );
+  assert.equal(h.ccOn(), false, "captions must still be off");
 });
