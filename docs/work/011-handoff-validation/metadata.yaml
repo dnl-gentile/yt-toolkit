@@ -7,7 +7,7 @@ tier_rationale: >
   authority, and the Pace Lock / Trim gating. A wrong adoption pins WPM to
   cue-level timings for a whole video; a wrong fetch guard reproduces the
   measured request storm. Path floor L (QUALITY.md §3).
-status: in-progress
+status: superseded
 supersedes:
   - W-010
 paths_owned:
@@ -82,3 +82,8 @@ notes: >
   allow-listed Video.js adapter; refreshing a same-video ASR authority without
   a CC toggle; and exposing only Highlight and Center inside the native Shorts
   captions menu.
+superseded_by: W-019
+superseded_note: >
+  Left in-progress when that session ended. Its open threads — the live ASR
+  acquisition path, the fetch budget, and the no-ASR degradation — were closed
+  or explicitly declared unproven in W-019, which carries the evidence.
