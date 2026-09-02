@@ -1,6 +1,6 @@
 # Keyboard shortcuts
 
-The extension claims **two** key combinations. Everything else stays YouTube's.
+The extension claims **five** keys. Everything else stays YouTube's.
 
 ## Ours
 
@@ -8,9 +8,29 @@ The extension claims **two** key combinations. Everything else stays YouTube's.
 |---|---|---|
 | <kbd>Shift</kbd> + <kbd>,</kbd> (i.e. <kbd><</kbd>) | −0.25× | −10 WPM |
 | <kbd>Shift</kbd> + <kbd>.</kbd> (i.e. <kbd>></kbd>) | +0.25× | +10 WPM |
+| <kbd>S</kbd> | −0.25× | −0.25× |
+| <kbd>D</kbd> | +0.25× | +0.25× |
+| <kbd>A</kbd>, or <kbd>Shift</kbd> + <kbd>`</kbd> | plain 1× on/off | plain 1× on/off |
 
-They only fire on `/watch` pages, and never while you are typing in a search box, a
-comment field, or any other text input.
+<kbd>S</kbd> and <kbd>D</kbd> are the unshifted twins of the first two: same step, no modifier,
+easier to hold. They move the *rate* in both modes, where <kbd>Shift</kbd>+<kbd>,</kbd> /
+<kbd>.</kbd> switch to moving the WPM target once Pace lock is on.
+
+### The 1× key is a state, not a nudge
+
+<kbd>A</kbd> (and <kbd>Shift</kbd>+<kbd>`</kbd>, which is the same key on a US layout) drops
+everything to plain 1× — Pace lock and Trim silence stop driving the rate — and pressing it
+again gives you your profile back exactly as it was.
+
+That state is **global**. It is not per-video and not per-tab: turn it on, open a different
+video tomorrow, and you are still at 1×. Your WPM target, lock state, trim setting and manual
+speed all wait underneath, untouched. Other open tabs follow along.
+
+It is the key to reach for when someone asks you what you are listening to, or when a video
+turns out to be music.
+
+They only fire on `/watch` and `/shorts/:id`, and never while you are typing in a search box, a
+comment field, or any other text input. The allow-listed course player has the same bindings.
 
 ## YouTube's, untouched
 

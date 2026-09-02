@@ -46,7 +46,7 @@ into docs/media/, then replace this comment with the table from that file.
   it does not hold a stale number.
 - **Pace lock** turns the speedometer into a target: 120–800 WPM, step 10, with presets at
   120 · 180 · 250 · 400 · 600 and the slider reaching 800. The extension solves for the rate:
-  `playbackRate = clamp(targetWpm / localWpm, 0.7, 2.5)`.
+  `playbackRate = clamp(targetWpm / localWpm, 0.7, 4)`.
 - **Trim silence** accelerates gaps of 1.2 s or longer (4×, or 8× past five seconds) and
   snaps back to your lock *on the first spoken word* — no seeking, so no decoder stutter.
 - **Adjusted watch clock** next to the pill: how long the video will actually take you,
@@ -98,6 +98,17 @@ for the listing status. Until then, load it unpacked:
 
 Chrome, Edge, Brave, Arc and other Chromium browsers all work — it is a standard
 Manifest V3 extension. Firefox is not supported.
+
+### One site that is not YouTube
+
+The extension also asks for `https://tvweb3.unip.br/*`, the Video.js player on a university
+course site, where it provides the speed pill, the adjusted clock and dual subtitles. That is an
+allow-list of exactly one, written literally into the manifest — not a wildcard, and not a
+generic speed controller for the web.
+
+Nothing else runs there: no No Distractions, no caption fetching, no telemetry, and no network
+request of any kind. [PRIVACY.md](PRIVACY.md) has the detail, including the two of that site's
+own settings the adapter keeps in step.
 
 > **Heads up:** the pace engine needs captions. On a video with no captions of any kind
 > there is nothing to measure, and the pill stays quiet. That is by design — the extension
@@ -170,7 +181,11 @@ npm run package            # build yt-toolkit.zip for a release
 | `lib/` | Pure, testable logic: `timedtext`, `wpm`, `clock`, `dual-lang` |
 | `content/` | Player-facing: `pace`, `captions`, `yt-menu-patch`, `inject` |
 | `content_script_youtube.js` | No Distractions and masthead toggle |
-| `options.html` / `options.js` | Options page (privacy only) |
+| `content_script_searchapp.js` | The toggle on the quiet search page |
+| `analytics.js` | Telemetry, imported by the service worker. Nothing else imports it |
+| `options.html` / `options.js` / `options.css` | Options page (privacy only) |
+| `icons/src/icon.svg` | The card icon's source. The PNGs are rendered from it |
+| `scripts/` | Packaging, icon rendering and checking, wiki publishing |
 | `docs/` | Spec, quality bar, host-drift monitor, work items |
 | `tests/` | Unit, integration, visual, live |
 

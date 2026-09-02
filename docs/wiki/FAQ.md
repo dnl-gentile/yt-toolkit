@@ -61,9 +61,19 @@ No. It is not an ad blocker and has no plans to become one.
 
 ### Does it work on YouTube Music, mobile, or embedded videos?
 
-No. Only `https://www.youtube.com` — not `music.youtube.com`, not `m.youtube.com`, not
-embedded players on other sites. Chrome on Android and iOS does not support extensions at
-all.
+No. Not `music.youtube.com`, not `m.youtube.com`, not embedded players on other sites. Chrome
+on Android and iOS does not support extensions at all.
+
+### Does it run anywhere other than YouTube?
+
+On exactly one other site: the Video.js course player at `tvweb3.unip.br`, written literally
+into the manifest. It is an allow-list of one, not a wildcard — the extension does nothing on
+any other site.
+
+There it gives you the speed pill, the adjusted clock and dual subtitles built from caption
+tracks the page already loaded. It does **not** bring No Distractions, and it fetches no
+captions of its own, so Pace lock, Trim silence, Colour highlight, Center word and WPM stay
+visibly unavailable rather than guessing at word timing that site does not publish.
 
 ### Firefox?
 

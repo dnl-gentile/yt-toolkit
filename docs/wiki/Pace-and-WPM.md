@@ -19,10 +19,19 @@ Next to it is the adjusted watch clock. See [the clock](#the-watch-clock) below.
 
 ## Two modes
 
-### Pace lock off — the pill measures
+### Pace lock off — the pill measures what you hear
 
-The WPM shown is the **measured local speaking rate** of the stretch you are in right now.
-It moves as the speaker moves: a slow explanation reads 90, an excited run reads 200.
+The WPM shown is the speaking rate **as it reaches you**: the speaker's own rate multiplied by
+the playback rate. A 90 WPM lecturer at 2× reads **180**, because 180 is what your ears are
+being asked to keep up with.
+
+That is the number worth watching, and it is why the pill is useful before you ever turn Pace
+lock on: nudge the speed with <kbd>S</kbd> / <kbd>D</kbd> until the WPM lands where you like it,
+and you have found your own target empirically. Turn the lock on at that number and the
+extension will hold it for you on every video afterwards.
+
+It still moves as the speaker moves — a slow explanation and an excited run read differently at
+the same playback rate.
 
 Pause in a silence, or sit through a musical interlude, and it reads **0**. That is
 correct behavior, not a bug — a stale "190" during silence would be a lie about what is
@@ -36,7 +45,7 @@ Turn on **Pace lock** in the pace menu. Now the WPM is your **target**, and the 
 adjusts playback rate to hit it:
 
 ```
-playbackRate = clamp(targetWpm / localWpm, 0.7, 2.5)
+playbackRate = clamp(targetWpm / localWpm, 0.7, 4)
 ```
 
 A speaker at 90 WPM with a 180 target plays near **2×**. A speaker already at 220 with a
