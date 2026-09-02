@@ -1,6 +1,11 @@
 # Live / real-host Playwright probe
 
-Loads the **unpacked extension from the repo root** and opens a public captioned YouTube watch URL from `videos.json`.
+Loads the **unpacked extension from the repo root** and probes both a public
+captioned YouTube watch URL from `videos.json` and a public `/shorts/:id` player.
+The Shorts gate checks active-player ownership, top-center geometry, native
+control clearance, menu interaction, CC invariance, request budget, and the
+absence of the lower watch clock. It also advances to the next Short and
+requires singleton reparenting plus menu close.
 
 This job is **manual / nightly**, not a required PR check (see `docs/QUALITY.md` §4). A skip with a clear YouTube block/consent/login message is acceptable; a missing `#movie_player` is treated as a host block, not a product failure.
 

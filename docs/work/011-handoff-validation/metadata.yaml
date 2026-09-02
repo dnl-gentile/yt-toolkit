@@ -1,0 +1,84 @@
+id: W-011
+slug: 011-handoff-validation
+title: "Validate the late ASR provenance changes; close fetch storm and no-ASR degradation"
+tier: L
+tier_rationale: >
+  Touches the rhythm source (QT.cues provenance), the timedtext fetch
+  authority, and the Pace Lock / Trim gating. A wrong adoption pins WPM to
+  cue-level timings for a whole video; a wrong fetch guard reproduces the
+  measured request storm. Path floor L (QUALITY.md §3).
+status: in-progress
+supersedes:
+  - W-010
+paths_owned:
+  - background.js
+  - manifest.json
+  - package.json
+  - package-lock.json
+  - README.md
+  - lib/dual-lang.js
+  - lib/prefs.js
+  - content/pace.js
+  - content/inject.js
+  - content/captions.js
+  - content/yt-menu-patch.js
+  - content/videojs.js
+  - styles.css
+  - styles-overlay.css
+  - styles-toggles.css
+  - tests/dual-lang.test.js
+  - tests/prefs.test.js
+  - tests/videojs.test.js
+  - tests/browser/videojs-neutral.spec.js
+  - tests/browser/asr-provenance.spec.js
+  - tests/browser/dual-subtitles.spec.js
+  - tests/browser/menu-flicker.spec.js
+  - tests/browser/no-asr-mode.spec.js
+  - tests/browser/ui-interactions.spec.js
+  - tests/visual/chrome.spec.js
+  - tests/visual/fixtures/chrome.html
+  - tests/visual/chrome.spec.js-snapshots/
+  - tests/live/probe.spec.js
+  - tests/integration/manifest.test.js
+  - tests/integration/asr-invariance.test.js
+  - tests/host/selectors.json
+  - docs/work/008-captions-overlay/check.mjs
+  - docs/work/011-handoff-validation/
+  - docs/SPEC.md
+  - docs/YOUTUBE-MONITOR.md
+  - design-qa.md
+notes: >
+  Entry state was HANDOFF-2026-08-20 with browser 14/15 (one red) and the
+  live/ASR item explicitly open. Two P0 defects were reproduced and fixed:
+  an uploaded fallback permanently blocking a late ASR promotion, and a
+  QT_TRACKS <-> QT_NEED_TRACKS feedback loop measured at 32,771 timedtext
+  fetches in the first second. The dead pace.js bgPull (second fetch
+  authority) was removed and is now guarded by a test. The no-ASR contract
+  from HANDOFF §2 was implemented and recorded as a dated SPEC supersession.
+  The 2026-08-24 neutral-speed contract is also implemented: A and
+  Shift+Backquote originally toggled temporary 1x without overwriting the custom profile;
+  S and D step Lock by 10 WPM or manual speed by 0.25x.
+  The stale Color highlight / Center word availability bug is also fixed:
+  open rows reconcile against live ASR, clicks revalidate that authority, and
+  hidden/preview player menus cannot outrank the visible canonical menu.
+  The Pace menu now uses playback multipliers for its large value, slider and
+  presets whenever Pace Lock is effectively off, restoring the saved manual
+  speed; WPM controls are reserved for an effectively active Lock. Slider
+  previews are cancel-safe across rebuild, navigation and late change events.
+  Dual Subtitles is proven end to end in fixtures; the real-profile
+  reproduction the handoff asks for is NOT closed - see EVIDENCE.md. The
+  2026-08-25 follow-up also owns the persistent two-vacancy language model,
+  native colored checks, and host-derived chrome-chip paint requested from
+  the supplied YouTube screenshots. The later neutral/Shorts correction keeps
+  every manual multiplier control usable from transient 1x; an explicit edit
+  exits neutral into saved manual speed and disables Pace Lock without erasing
+  Trim. Shorts now binds to the real external native controls, uses a cached
+  responsive lane, mirrors effective opacity and native height, degrades the
+  label from full to rate-only to a square icon, and fails closed/inert when
+  the controller or minimum lane disappears. Final browser and normal-profile
+  visual acceptance remain open pending explicit browser-run permission and an
+  unpacked-extension reload. The 2026-08-29 supersession now owns making that
+  reversible 1x state persistent across video navigation, reload, tabs and the
+  allow-listed Video.js adapter; refreshing a same-video ASR authority without
+  a CC toggle; and exposing only Highlight and Center inside the native Shorts
+  captions menu.

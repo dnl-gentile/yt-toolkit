@@ -43,13 +43,18 @@
     guide: null,
     watchFlexy: null,
     moviePlayer: null,
-    watchInners: [],
     html: null
   };
 
   let chromeRaf = 0;
   let watchRaf = 0;
   const pendingTimeouts = [];
+
+  /* Theater mode is requested from yt-page-data-updated, yt-navigate-finish
+     and a 0/100/400/1000 ms retry ladder. Without a cooldown those stack into
+     a click storm that toggles the size button repeatedly. */
+  const THEATER_COOLDOWN_MS = 1500;
+  let lastTheaterRequestAt = 0;
 
   function isLightTheme() {
     const html = document.documentElement;
@@ -93,7 +98,7 @@
     const id = setTimeout(() => {
       const i = pendingTimeouts.indexOf(id);
       if (i >= 0) pendingTimeouts.splice(i, 1);
-      if (!isUnloading) fn();
+      if (!shouldSkipDomWork()) fn();
     }, ms);
     pendingTimeouts.push(id);
     return id;
@@ -104,6 +109,24 @@
       clearTimeout(pendingTimeouts[i]);
     }
     pendingTimeouts.length = 0;
+  }
+
+  function readNoDistractions(callback) {
+    const done = (value) => callback(value == null ? true : value);
+    const Prefs = globalThis.YtToolkitPrefs;
+    if (Prefs) {
+      Prefs.get(['noDistractionsEnabled'], ({ noDistractionsEnabled }) => {
+        done(noDistractionsEnabled);
+      });
+      return;
+    }
+    try {
+      chrome.storage.sync.get(['noDistractionsEnabled'], ({ noDistractionsEnabled }) => {
+        done(noDistractionsEnabled);
+      });
+    } catch {
+      done(cachedNoDistractionsEnabled);
+    }
   }
 
   function createToggleButton() {
@@ -122,14 +145,20 @@
     const tooltip = document.createElement('div');
     tooltip.className = 'yt-quiet-mode-tooltip';
     tooltip.setAttribute('role', 'tooltip');
-    chrome.storage.sync.get(['noDistractionsEnabled'], ({ noDistractionsEnabled }) => {
-      const enabled = noDistractionsEnabled ?? true;
-      tooltip.textContent = enabled ? 'No Distractions - Off' : 'No Distractions - On';
-    });
+    const enabled = cachedNoDistractionsEnabled ?? true;
+    tooltip.textContent = enabled ? 'No Distractions - Off' : 'No Distractions - On';
     button.appendChild(tooltip);
 
     button.addEventListener('click', () => {
-      chrome.runtime.sendMessage({ action: 'toggleNoDistractions' });
+      button.blur();
+      const Ext = globalThis.YtToolkitExt;
+      if (Ext) Ext.send({ action: 'toggleNoDistractions' });
+      else {
+        try {
+          if (chrome.runtime && chrome.runtime.id)
+            chrome.runtime.sendMessage({ action: 'toggleNoDistractions' });
+        } catch { /* context invalidated */ }
+      }
     });
 
     let hoverTimeout;
@@ -159,32 +188,59 @@
     return button;
   }
 
+  /* Every write below lands inside ytd-masthead, which chromeObserver watches
+     with { childList: true, subtree: true }. An unconditional
+     tooltip.textContent assignment replaces the text node and is therefore a
+     childList mutation that re-fires the observer: the extension fed itself
+     one full pass per animation frame, forever, with a clean console.
+     Measured 1200 masthead mutations in 2 s on an otherwise idle page. Every
+     writer that touches the masthead must stay idempotent. */
+  function setAttrOnce(el, name, value) {
+    if (!el) return;
+    if (el.getAttribute(name) !== value) el.setAttribute(name, value);
+  }
+
+  function setStyleOnce(el, name, value, priority) {
+    if (!el) return;
+    if (el.style.getPropertyValue(name) === value) return;
+    if (priority) el.style.setProperty(name, value, priority);
+    else el.style.setProperty(name, value);
+  }
+
+  function hideOnce(el) {
+    if (!el) return;
+    if (el.style.display !== 'none') el.style.display = 'none';
+    if (el.dataset.noDistractionsHidden !== 'true') {
+      el.dataset.noDistractionsHidden = 'true';
+    }
+  }
+
   function updateIcon(noDistractionsEnabled) {
     if (!noDistractionsButton) return;
 
     const icon = noDistractionsButton.querySelector('#quiet-mode-toggle-icon');
     const tooltip = noDistractionsButton.querySelector('.yt-quiet-mode-tooltip');
-    if (icon) icon.src = getIconURL(noDistractionsEnabled);
-    if (tooltip) {
-      tooltip.textContent = noDistractionsEnabled
-        ? 'No Distractions - Off'
-        : 'No Distractions - On';
-    }
 
-    if (noDistractionsEnabled) {
-      noDistractionsButton.setAttribute('aria-label', 'No Distractions Mode: ON - Click to disable');
-      noDistractionsButton.setAttribute('aria-pressed', 'true');
-    } else {
-      noDistractionsButton.setAttribute('aria-label', 'No Distractions Mode: OFF - Click to enable');
-      noDistractionsButton.setAttribute('aria-pressed', 'false');
-    }
+    const nextIcon = getIconURL(noDistractionsEnabled);
+    const nextTooltip = noDistractionsEnabled
+      ? 'No Distractions - Off'
+      : 'No Distractions - On';
+    const nextLabel = noDistractionsEnabled
+      ? 'No Distractions Mode: ON - Click to disable'
+      : 'No Distractions Mode: OFF - Click to enable';
+
+    if (icon && icon.getAttribute('src') !== nextIcon) icon.src = nextIcon;
+    if (tooltip && tooltip.textContent !== nextTooltip) tooltip.textContent = nextTooltip;
+    setAttrOnce(noDistractionsButton, 'aria-label', nextLabel);
+    setAttrOnce(noDistractionsButton, 'aria-pressed', noDistractionsEnabled ? 'true' : 'false');
   }
 
   function addToggleButtonToNavbar() {
     const existing = document.getElementById('quiet-mode-toggle-button');
     if (existing) {
+      /* onChromeMutations calls updateIcon immediately after this; doing it
+         here as well doubled the masthead writes on every pass. */
       noDistractionsButton = existing;
-      if (cachedNoDistractionsEnabled !== null) updateIcon(cachedNoDistractionsEnabled);
       return;
     }
 
@@ -207,8 +263,8 @@
     if (cachedNoDistractionsEnabled !== null) {
       updateIcon(cachedNoDistractionsEnabled);
     } else {
-      chrome.storage.sync.get(['noDistractionsEnabled'], ({ noDistractionsEnabled }) => {
-        updateIcon(noDistractionsEnabled ?? true);
+      readNoDistractions((noDistractionsEnabled) => {
+        updateIcon(noDistractionsEnabled);
       });
     }
   }
@@ -220,7 +276,6 @@
     observed.guide = null;
     observed.watchFlexy = null;
     observed.moviePlayer = null;
-    observed.watchInners = [];
     observed.html = null;
     if (chromeRaf) {
       cancelAnimationFrame(chromeRaf);
@@ -230,35 +285,6 @@
       cancelAnimationFrame(watchRaf);
       watchRaf = 0;
     }
-  }
-
-  function collectWatchInnerTargets(watchFlexy) {
-    if (!watchFlexy) return [];
-    const nodes = [];
-    const push = (el) => {
-      if (!el || nodes.indexOf(el) !== -1) return;
-      if (el.id === 'movie_player' || (el.closest && el.closest('#movie_player'))) return;
-      nodes.push(el);
-    };
-    // childList only on ancestors that also wrap the player — never subtree there.
-    push(watchFlexy.querySelector('#columns'));
-    push(watchFlexy.querySelector('#primary'));
-    push(watchFlexy.querySelector('#secondary'));
-    push(watchFlexy.querySelector('#related'));
-    push(watchFlexy.querySelector('#comments'));
-    push(watchFlexy.querySelector('#below'));
-    push(watchFlexy.querySelector('#panels'));
-    push(watchFlexy.querySelector('ytd-watch-metadata'));
-    push(watchFlexy.querySelector('#top-row'));
-    return nodes;
-  }
-
-  function sameNodeList(a, b) {
-    if (a.length !== b.length) return false;
-    for (let i = 0; i < a.length; i++) {
-      if (a[i] !== b[i]) return false;
-    }
-    return true;
   }
 
   function attachObservers() {
@@ -299,21 +325,18 @@
       watchObserver.disconnect();
       observed.watchFlexy = null;
       observed.moviePlayer = null;
-      observed.watchInners = [];
       return;
     }
 
-    const watchInners = collectWatchInnerTargets(watchFlexy);
     const watchChanged =
       watchFlexy !== observed.watchFlexy ||
-      moviePlayer !== observed.moviePlayer ||
-      !sameNodeList(watchInners, observed.watchInners);
+      moviePlayer !== observed.moviePlayer;
 
     if (watchChanged) {
       watchObserver.disconnect();
       observed.watchFlexy = watchFlexy || null;
       observed.moviePlayer = moviePlayer || null;
-      observed.watchInners = watchInners;
+      // SPEC §9: only flexy + player. Never #comments/#related/#below/#secondary/#panels.
       if (watchFlexy) {
         watchObserver.observe(watchFlexy, {
           childList: true,
@@ -322,15 +345,6 @@
           attributeFilter: ['theater', 'hidden']
         });
       }
-      watchInners.forEach((node) => {
-        const subtree = node.id !== 'columns' && node.id !== 'primary';
-        watchObserver.observe(node, {
-          childList: true,
-          subtree: subtree,
-          attributes: true,
-          attributeFilter: ['visibility', 'hidden', 'theater']
-        });
-      });
       if (moviePlayer) {
         // Direct children only: caption/progress ticks must not re-enter hide work.
         watchObserver.observe(moviePlayer, { childList: true, subtree: false });
@@ -370,8 +384,20 @@
     return false;
   }
 
-  function onChromeMutations() {
+  function isOwnChromeMutation(mutation) {
+    const target = mutation && mutation.target;
+    if (!target) return false;
+    const el = target.nodeType === 1 ? target : target.parentElement;
+    if (!el) return false;
+    if (el.id === 'quiet-mode-toggle-button') return true;
+    return !!(el.closest && el.closest('#quiet-mode-toggle-button'));
+  }
+
+  function onChromeMutations(mutations) {
     if (shouldSkipDomWork() || cachedNoDistractionsEnabled === null) return;
+    /* Belt and braces with the idempotent writers: if one of our own writes
+       ever produces a record again, it must not schedule another pass. */
+    if (mutations && mutations.length && mutations.every(isOwnChromeMutation)) return;
     if (chromeRaf) return;
     chromeRaf = requestAnimationFrame(() => {
       chromeRaf = 0;
@@ -402,7 +428,6 @@
       removeSuggestions();
       removeEndScreenRecommendations();
       hideActionButtons();
-      replaceVerificationTags();
     });
   }
 
@@ -484,7 +509,9 @@
       'click',
       (e) => {
         if (!cachedNoDistractionsEnabled || shouldSkipDomWork()) return;
-        const t = e.target && e.target.closest && e.target.closest('button, a, yt-button-shape, ytd-button-renderer, .ytp-button');
+        const t = e.target && e.target.closest && e.target.closest(
+          'button, a, yt-button-shape, ytd-button-renderer, yt-chip-cloud-chip-renderer, yt-chip-shape, .ytChipShape, .ytp-button'
+        );
         if (!t) return;
         const label = (
           (t.getAttribute('aria-label') || '') +
@@ -511,23 +538,22 @@
 
   function pathFromNavigateEvent(e) {
     const detail = e && e.detail;
-    if (!detail) return '';
-    const raw = detail.url || detail.pageUrl || '';
-    if (!raw) return '';
+    const raw = (detail && (detail.url || detail.pageUrl)) || '';
+    if (!raw) return window.location.pathname || '';
     try {
       return new URL(raw, window.location.origin).pathname;
     } catch (err) {
-      return '';
+      return window.location.pathname || '';
     }
   }
 
   function handleNavigateStart(e) {
     isNavigating = true;
     disconnectObservers();
+    clearPendingTimeouts();
     const path = pathFromNavigateEvent(e);
-    if (cachedNoDistractionsEnabled && path && isYoutubeHomePath(path)) {
+    if (cachedNoDistractionsEnabled && isYoutubeHomePath(path)) {
       isUnloading = true;
-      clearPendingTimeouts();
     }
   }
 
@@ -554,7 +580,6 @@
       collapseLeftSidebar();
       if (isVideoPage()) {
         checkAndApplyNoDistractions();
-        replaceVerificationTags();
       }
     }
 
@@ -562,8 +587,8 @@
   }
 
   function handlePageDataUpdated() {
-    if (isUnloading) return;
-    isNavigating = false;
+    // Do not clear isNavigating. Attach/hide only after yt-navigate-finish.
+    if (shouldSkipDomWork()) return;
     attachObservers();
     addToggleButtonToNavbar();
     if (cachedNoDistractionsEnabled) {
@@ -675,8 +700,6 @@
   document.addEventListener('yt-navigate-finish', handleNavigateFinish, true);
   document.addEventListener('yt-page-data-updated', handlePageDataUpdated, true);
   window.addEventListener('pagehide', teardown);
-  window.addEventListener('beforeunload', teardown);
-  window.addEventListener('unload', teardown);
   window.addEventListener('pageshow', (e) => {
     if (e.persisted) {
       isUnloading = false;
@@ -696,6 +719,7 @@
     removeComments();
     hideActionButtons();
     removeEndScreenRecommendations();
+    replaceVerificationTags();
   }
 
   function ensureSearchAutocompleteVisible() {
@@ -765,8 +789,7 @@
 
     if (createButton) {
       const buttonRenderer = createButton.closest('ytd-button-renderer') || createButton;
-      buttonRenderer.style.display = 'none';
-      buttonRenderer.dataset.noDistractionsHidden = 'true';
+      hideOnce(buttonRenderer);
     } else {
       const allButtonRenderers = document.querySelectorAll('ytd-button-renderer, ytd-topbar-menu-button-renderer, a[href*="/create"]');
       allButtonRenderers.forEach(btn => {
@@ -779,20 +802,19 @@
             buttonAriaLabel.toLowerCase().includes('create') ||
             text.toLowerCase().includes('create') ||
             href.includes('/create')) {
-          btn.style.display = 'none';
-          btn.dataset.noDistractionsHidden = 'true';
+          hideOnce(btn);
         }
       });
     }
 
     const notificationButton = document.querySelector('ytd-notification-topbar-button-renderer, #notification-button, button[aria-label*="Notifications"], button[aria-label*="notifications"]');
     if (notificationButton) {
-      notificationButton.style.display = 'none';
-      notificationButton.dataset.noDistractionsHidden = 'true';
+      hideOnce(notificationButton);
     }
   }
 
   function restoreNavbarButtons() {
+    if (shouldSkipDomWork()) return;
     const navbar = document.querySelector('ytd-masthead #end #buttons') || document.querySelector('ytd-masthead');
     if (!navbar) return;
 
@@ -819,6 +841,20 @@
     guideSelectors.forEach(selector => {
       const guide = document.querySelector(selector);
       if (guide) {
+        /* Cheap inline-style check first. getComputedStyle and offsetWidth
+           both force synchronous layout, and this ran once per animation
+           frame for five selectors. YouTube keeps the `opened` attribute on
+           #guide, so the old isExpanded test stayed true even after we set
+           width to 0 and re-applied all seven properties forever. If our own
+           collapse is still in place there is nothing to do; if YouTube
+           overrode it, the inline value differs and we recompute. */
+        if (
+          guide.getAttribute('data-no-distractions-collapsed') === 'true' &&
+          guide.style.getPropertyValue('width') === '0px'
+        ) {
+          sidebarCollapsed = true;
+          return;
+        }
         const computedStyle = window.getComputedStyle(guide);
         const width = parseFloat(computedStyle.width) || 0;
         const isExpanded = width > 50 ||
@@ -832,14 +868,14 @@
             guide.dataset.originalWidth = computedStyle.width;
           }
 
-          guide.style.setProperty('width', '0px', 'important');
-          guide.style.setProperty('min-width', '0px', 'important');
-          guide.style.setProperty('max-width', '0px', 'important');
-          guide.style.setProperty('opacity', '0', 'important');
-          guide.style.setProperty('visibility', 'hidden', 'important');
-          guide.style.setProperty('pointer-events', 'none', 'important');
-          guide.style.setProperty('transform', 'translateX(-100%)', 'important');
-          guide.setAttribute('data-no-distractions-collapsed', 'true');
+          setStyleOnce(guide, 'width', '0px', 'important');
+          setStyleOnce(guide, 'min-width', '0px', 'important');
+          setStyleOnce(guide, 'max-width', '0px', 'important');
+          setStyleOnce(guide, 'opacity', '0', 'important');
+          setStyleOnce(guide, 'visibility', 'hidden', 'important');
+          setStyleOnce(guide, 'pointer-events', 'none', 'important');
+          setStyleOnce(guide, 'transform', 'translateX(-100%)', 'important');
+          setAttrOnce(guide, 'data-no-distractions-collapsed', 'true');
           sidebarCollapsed = true;
         }
       }
@@ -862,12 +898,12 @@
           const isExpanded = width > 50 || guide.offsetWidth > 50;
 
           if (isExpanded) {
-            guide.style.setProperty('width', '0px', 'important');
-            guide.style.setProperty('min-width', '0px', 'important');
-            guide.style.setProperty('max-width', '0px', 'important');
-            guide.style.setProperty('opacity', '0', 'important');
-            guide.style.setProperty('visibility', 'hidden', 'important');
-            guide.setAttribute('data-no-distractions-collapsed', 'true');
+            setStyleOnce(guide, 'width', '0px', 'important');
+            setStyleOnce(guide, 'min-width', '0px', 'important');
+            setStyleOnce(guide, 'max-width', '0px', 'important');
+            setStyleOnce(guide, 'opacity', '0', 'important');
+            setStyleOnce(guide, 'visibility', 'hidden', 'important');
+            setAttrOnce(guide, 'data-no-distractions-collapsed', 'true');
           }
         }
       }
@@ -875,7 +911,7 @@
   }
 
   function restoreLeftSidebar() {
-    if (cachedNoDistractionsEnabled || isUnloading) return;
+    if (cachedNoDistractionsEnabled || shouldSkipDomWork()) return;
 
     const collapsedGuides = document.querySelectorAll('[data-no-distractions-collapsed="true"]');
     collapsedGuides.forEach(guide => {
@@ -933,21 +969,38 @@
     );
 
     if (theaterButton) {
-      const ariaLabel = theaterButton.getAttribute('aria-label') || '';
-      if (ariaLabel.toLowerCase().includes('theater') ||
-          !ariaLabel.toLowerCase().includes('fullscreen')) {
+      /* The old test was `includes('theater') || !includes('fullscreen')`,
+         and the right-hand side is true for an empty or unknown label — so
+         any matched button got clicked. Combined with yt-page-data-updated
+         and the 0/100/400/1000 ms retries that produced a click storm
+         (measured 53 clicks), toggling theater mode on and off. Only act when
+         YouTube says the action enters theater mode, and never more than once
+         per cooldown. */
+      const actionLabel = [
+        theaterButton.getAttribute('aria-label') || '',
+        theaterButton.getAttribute('title') || '',
+        theaterButton.getAttribute('data-title-no-tooltip') || ''
+      ].join(' ').toLowerCase();
+
+      const now = Date.now();
+      if (/(theater|cinema|teatro)/.test(actionLabel) &&
+          now - lastTheaterRequestAt >= THEATER_COOLDOWN_MS) {
+        lastTheaterRequestAt = now;
         theaterButton.click();
       }
     } else {
       later(() => {
         if (shouldSkipDomWork() || !cachedNoDistractionsEnabled) return;
         const sizeToggle = document.querySelector('ytd-size-toggle-renderer');
-        if (sizeToggle) {
-          const buttons = sizeToggle.querySelectorAll('button');
-          if (buttons.length > 0 && buttons[0]) {
-            buttons[0].click();
-          }
-        }
+        if (!sizeToggle) return;
+        const buttons = sizeToggle.querySelectorAll('button');
+        if (!buttons.length || !buttons[0]) return;
+        /* Same cooldown as the direct path: every retry timer and every
+           yt-page-data-updated event lands here too. */
+        const now = Date.now();
+        if (now - lastTheaterRequestAt < THEATER_COOLDOWN_MS) return;
+        lastTheaterRequestAt = now;
+        buttons[0].click();
       }, 500);
     }
   }
@@ -990,20 +1043,59 @@
     delete element.dataset.noDistractionsSecondaryCollapse;
   }
 
+  function ndLayoutEls() {
+    const flexy = document.querySelector('ytd-watch-flexy');
+    return {
+      flexy,
+      primary: flexy ? flexy.querySelector('#primary') : null,
+      inner: [
+        flexy && flexy.querySelector('#columns'),
+        flexy && flexy.querySelector('#primary-inner'),
+        flexy && flexy.querySelector('#below'),
+        flexy && flexy.querySelector('ytd-watch-metadata'),
+      ].filter(Boolean),
+    };
+  }
+
   function expandPrimaryColumn() {
-    const primary = document.querySelector('ytd-watch-flexy #primary');
+    const { flexy, primary, inner } = ndLayoutEls();
+    if (flexy) {
+      flexy.classList.add('qt-nd-on');
+      flexy.classList.toggle('qt-nd-panel', inThisVideoOpen());
+      flexy.style.setProperty('--ytd-watch-flexy-sidebar-width', '0px', 'important');
+      flexy.style.setProperty('--ytd-watch-flexy-sidebar-min-width', '0px', 'important');
+    }
+    document.documentElement.classList.add('qt-nd-on');
     if (!primary) return;
     primary.dataset.noDistractionsPrimaryExpanded = 'true';
-    primary.style.setProperty('flex', '1 1 100%', 'important');
+    primary.style.setProperty('flex', '1 1 auto', 'important');
     primary.style.setProperty('max-width', '100%', 'important');
+    primary.style.setProperty('width', '100%', 'important');
+    inner.forEach((el) => {
+      el.style.setProperty('max-width', '100%', 'important');
+      el.style.setProperty('width', '100%', 'important');
+    });
   }
 
   function restorePrimaryColumn() {
+    if (shouldSkipDomWork()) return;
+    const { flexy, inner } = ndLayoutEls();
+    if (flexy) {
+      flexy.classList.remove('qt-nd-on', 'qt-nd-panel');
+      flexy.style.removeProperty('--ytd-watch-flexy-sidebar-width');
+      flexy.style.removeProperty('--ytd-watch-flexy-sidebar-min-width');
+    }
+    document.documentElement.classList.remove('qt-nd-on');
     const primaries = document.querySelectorAll('ytd-watch-flexy #primary[data-no-distractions-primary-expanded="true"]');
     primaries.forEach(primary => {
       primary.style.removeProperty('flex');
       primary.style.removeProperty('max-width');
+      primary.style.removeProperty('width');
       primary.removeAttribute('data-no-distractions-primary-expanded');
+    });
+    inner.forEach((el) => {
+      el.style.removeProperty('max-width');
+      el.style.removeProperty('width');
     });
   }
 
@@ -1034,8 +1126,13 @@
 
     // Keep #secondary alive so "In this video" / Timeline / Transcript can open.
     if (inThisVideoOpen()) {
+      const flexy = document.querySelector('ytd-watch-flexy');
+      if (flexy) flexy.classList.add('qt-nd-panel');
       clearSecondaryHiddenStyles(secondary);
       restorePrimaryColumn();
+      if (flexy) {
+        flexy.classList.add('qt-nd-on', 'qt-nd-panel');
+      }
       hideRelatedOnly();
       secondary.querySelectorAll('ytd-engagement-panel-section-list-renderer').forEach((p) => {
         p.style.removeProperty('display');
@@ -1052,7 +1149,7 @@
   }
 
   function restoreSuggestions() {
-    if (isUnloading) return;
+    if (shouldSkipDomWork()) return;
     const selectors = [
       '#secondary',
       'ytd-watch-flexy #secondary',
@@ -1145,7 +1242,7 @@
   }
 
   function restoreComments() {
-    if (isUnloading) return;
+    if (shouldSkipDomWork()) return;
     const selectors = [
       '#comments',
       'ytd-comments#comments',
@@ -1253,7 +1350,7 @@
   }
 
   function restoreEndScreenRecommendations() {
-    if (isUnloading) return;
+    if (shouldSkipDomWork()) return;
     const selectors = [
       '.ytp-fullscreen-grid-stills-container',
       '.ytp-modern-videowall-still',
@@ -1333,7 +1430,7 @@
   }
 
   function showActionButtons() {
-    if (isUnloading) return;
+    if (shouldSkipDomWork()) return;
     const containers = document.querySelectorAll('#top-level-buttons-computed, ytd-menu-renderer, #actions, #menu-container, ytd-watch-metadata #top-level-buttons-computed');
 
     containers.forEach(container => {
@@ -1417,7 +1514,7 @@
   }
 
   function restoreAllHiddenElements() {
-    if (cachedNoDistractionsEnabled || isUnloading) return;
+    if (cachedNoDistractionsEnabled || shouldSkipDomWork()) return;
 
     const hiddenElements = document.querySelectorAll('[data-no-distractions-hidden="true"]');
     hiddenElements.forEach(element => {
@@ -1453,10 +1550,10 @@
   }
 
   function scheduleRestoreAfterDisable() {
-    if (cachedNoDistractionsEnabled === null || cachedNoDistractionsEnabled || !isVideoPage() || isUnloading) return;
+    if (cachedNoDistractionsEnabled === null || cachedNoDistractionsEnabled || !isVideoPage() || shouldSkipDomWork()) return;
 
     const restoreAll = () => {
-      if (cachedNoDistractionsEnabled || isUnloading) return;
+      if (cachedNoDistractionsEnabled || shouldSkipDomWork()) return;
 
       if (isInitialPageLoad && (document.readyState !== 'complete' || document.querySelector('video')?.readyState < 3)) {
         return;
@@ -1600,7 +1697,7 @@
   interceptGuideButtonClicks();
   bindEngagementPanelClicks();
 
-  chrome.storage.sync.get(['noDistractionsEnabled'], ({ noDistractionsEnabled }) => {
+  readNoDistractions((noDistractionsEnabled) => {
     cachedNoDistractionsEnabled = (noDistractionsEnabled === undefined || noDistractionsEnabled === null)
       ? true
       : noDistractionsEnabled;

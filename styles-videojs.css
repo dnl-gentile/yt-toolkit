@@ -1,0 +1,422 @@
+/* UNIP Video.js adapter. Every selector is scoped to the allow-listed host root. */
+.video-js.qt-host-videojs {
+  --qt-vjs-control-height: 30px;
+  --qt-vjs-caption-size: 18px;
+  --qt-vjs-surface: rgba(43, 51, 63, 0.88);
+  --qt-vjs-menu-surface: rgba(43, 51, 63, 0.96);
+}
+
+.qt-host-videojs .vjs-control-bar {
+  z-index: 10;
+}
+
+.qt-host-videojs .qt-vjs-cluster {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  z-index: 11;
+  height: var(--qt-vjs-control-height);
+  transform: translateX(-50%);
+  color: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1;
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 0.2s ease;
+}
+
+.qt-host-videojs .qt-vjs-cluster.qt-vjs-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.qt-host-videojs .qt-vjs-pill {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  overflow: hidden;
+  border: 0;
+  border-radius: calc(var(--qt-vjs-control-height) / 2);
+  background: var(--qt-vjs-surface);
+  box-shadow: none;
+  white-space: nowrap;
+}
+
+.qt-host-videojs .qt-vjs-cluster-label {
+  min-width: 30px;
+  padding: 0 3px 0 12px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.qt-host-videojs .qt-vjs-speed-button {
+  display: inline-flex;
+  flex: 0 0 var(--qt-vjs-control-height);
+  align-items: center;
+  justify-content: center;
+  width: var(--qt-vjs-control-height);
+  height: var(--qt-vjs-control-height);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+
+.qt-host-videojs .qt-vjs-speed-button:hover,
+.qt-host-videojs .qt-vjs-speed-button:focus-visible {
+  background: rgba(255, 255, 255, 0.12);
+  outline: none;
+}
+
+.qt-host-videojs .qt-vjs-ico {
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+}
+
+.qt-host-videojs .qt-vjs-menu {
+  position: absolute;
+  top: calc(8px + var(--qt-vjs-control-height) + 6px);
+  left: 50%;
+  z-index: 12;
+  box-sizing: border-box;
+  width: min(310px, calc(100% - 16px));
+  max-height: calc(
+    100% - var(--qt-vjs-control-height) - var(--qt-vjs-control-height) - 22px
+  );
+  overflow-x: hidden;
+  overflow-y: auto;
+  transform: translateX(-50%);
+  border: 0;
+  border-radius: 2px;
+  color: #fff;
+  background: var(--qt-vjs-menu-surface);
+  box-shadow: none;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.35;
+  scrollbar-width: thin;
+  overscroll-behavior: contain;
+}
+
+.qt-host-videojs .qt-vjs-menu[hidden] {
+  display: none !important;
+}
+
+.qt-host-videojs .qt-vjs-menu-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 38px;
+  padding: 4px 14px 0;
+  font-weight: 600;
+}
+
+.qt-host-videojs .qt-vjs-menu-sub,
+.qt-host-videojs .qt-vjs-big,
+.qt-host-videojs .qt-vjs-capability {
+  margin: 0;
+}
+
+.qt-host-videojs .qt-vjs-menu-sub {
+  padding: 0 14px 8px 44px;
+  color: rgba(255, 255, 255, 0.74);
+  font-size: 12px;
+}
+
+.qt-host-videojs .qt-vjs-big {
+  padding: 10px 14px 6px;
+  font-size: 28px;
+  text-align: center;
+}
+
+.qt-host-videojs .qt-vjs-rule {
+  height: 1px;
+  margin: 0 12px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.qt-host-videojs .qt-vjs-slider-row {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) 30px;
+  align-items: center;
+  gap: 9px;
+  padding: 4px 14px 8px;
+}
+
+.qt-host-videojs .qt-vjs-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.11);
+  cursor: pointer;
+  font: inherit;
+  font-size: 20px;
+}
+
+.qt-host-videojs .qt-vjs-slider-row input[type="range"] {
+  width: 100%;
+  margin: 0;
+  accent-color: #fff;
+}
+
+.qt-host-videojs .qt-vjs-presets {
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 10px 12px;
+}
+
+.qt-host-videojs .qt-vjs-preset {
+  min-width: 42px;
+  height: 26px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 13px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+}
+
+.qt-host-videojs .qt-vjs-preset.is-selected {
+  color: #1f252d;
+  background: #fff;
+}
+
+.qt-host-videojs .qt-vjs-row {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) 34px;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 38px;
+  padding: 3px 14px;
+  border: 0;
+  color: inherit;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+}
+
+.qt-host-videojs .qt-vjs-row-button {
+  grid-template-columns: minmax(0, 1fr) 34px;
+  cursor: pointer;
+}
+
+.qt-host-videojs .qt-vjs-row-button:hover:not(.qt-vjs-row-disabled),
+.qt-host-videojs .qt-vjs-language:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.qt-host-videojs .qt-vjs-row-disabled {
+  color: rgba(255, 255, 255, 0.42);
+  cursor: not-allowed;
+}
+
+.qt-host-videojs .qt-vjs-row-icon {
+  display: inline-flex;
+  align-items: center;
+}
+
+.qt-host-videojs .qt-vjs-switch {
+  position: relative;
+  width: 32px;
+  height: 18px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.qt-host-videojs .qt-vjs-switch::after {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #d7d7d7;
+  content: "";
+  transition: transform 0.15s ease;
+}
+
+.qt-host-videojs .qt-vjs-switch.is-on {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.qt-host-videojs .qt-vjs-switch.is-on::after {
+  background: #2b333f;
+  transform: translateX(14px);
+}
+
+.qt-host-videojs .qt-vjs-section-title {
+  padding: 10px 14px 4px;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.qt-host-videojs .qt-vjs-language-list {
+  padding: 0 0 5px;
+}
+
+.qt-host-videojs .qt-vjs-language {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  align-items: center;
+  width: 100%;
+  min-height: 34px;
+  padding: 2px 14px;
+  border: 0;
+  color: #fff;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.qt-host-videojs .qt-vjs-language-check {
+  display: inline-flex;
+  align-items: center;
+  width: 20px;
+  height: 20px;
+}
+
+.qt-host-videojs .qt-vjs-language.is-primary .qt-vjs-language-check {
+  color: #ffcc00;
+}
+
+.qt-host-videojs .qt-vjs-language.is-secondary .qt-vjs-language-check {
+  color: #3ea6ff;
+}
+
+.qt-host-videojs .qt-vjs-check {
+  width: 18px;
+  height: 18px;
+}
+
+.qt-host-videojs .qt-vjs-capability {
+  padding: 8px 14px 11px;
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.qt-host-videojs.qt-vjs-clock-ready .vjs-current-time,
+.qt-host-videojs.qt-vjs-clock-ready .vjs-time-divider,
+.qt-host-videojs.qt-vjs-clock-ready .vjs-duration {
+  display: none !important;
+}
+
+.qt-host-videojs .qt-vjs-clock.vjs-control {
+  display: flex;
+  flex: 0 1 auto;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: auto !important;
+  min-width: 84px;
+  max-width: 126px;
+  height: var(--qt-vjs-control-height);
+  padding: 0 7px;
+  cursor: default;
+  color: inherit;
+  font-family: inherit;
+  font-size: 12px;
+  line-height: var(--qt-vjs-control-height);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.qt-host-videojs .qt-vjs-clock .qt-orig-time {
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.qt-host-videojs .qt-vjs-captions {
+  position: absolute;
+  top: calc(8px + var(--qt-vjs-control-height) + 8px);
+  right: 7.5%;
+  bottom: calc(var(--qt-vjs-control-height) + 10px);
+  left: 7.5%;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  color: #fff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: var(--qt-vjs-caption-size);
+  line-height: 1.24;
+  text-align: center;
+  pointer-events: none;
+  overflow: hidden;
+  transition: bottom 0.18s ease;
+}
+
+.qt-host-videojs .qt-vjs-captions[hidden] {
+  display: none !important;
+}
+
+.qt-host-videojs .qt-vjs-caption {
+  box-sizing: border-box;
+  width: fit-content;
+  max-width: 100%;
+  padding: 2px 4px;
+  border-radius: 1px;
+  background: rgba(0, 0, 0, 0.78);
+  text-shadow: 0 0 2px #000;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.qt-host-videojs .qt-vjs-caption-primary {
+  color: #ffcc00;
+}
+
+.qt-host-videojs .qt-vjs-caption-secondary {
+  color: #3ea6ff;
+}
+
+.qt-host-videojs.vjs-user-inactive.vjs-playing:not(.qt-vjs-menu-open) .qt-vjs-captions {
+  bottom: 10px;
+}
+
+.qt-host-videojs.qt-vjs-dual-active .vjs-text-track-display,
+.qt-host-videojs.qt-vjs-dual-active > .videoTrack {
+  opacity: 0 !important;
+}
+
+.qt-host-videojs.qt-vjs-narrow .qt-vjs-menu {
+  width: min(300px, calc(100% - 16px));
+}
+
+.qt-host-videojs.qt-vjs-narrow .qt-vjs-clock.vjs-control {
+  min-width: 68px;
+  max-width: 82px;
+  padding: 0 5px;
+  font-size: 11px;
+}
+
+.qt-host-videojs.qt-vjs-narrow .qt-vjs-clock .qt-orig-time {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qt-host-videojs .qt-vjs-cluster,
+  .qt-host-videojs .qt-vjs-captions,
+  .qt-host-videojs .qt-vjs-switch::after {
+    transition: none;
+  }
+}

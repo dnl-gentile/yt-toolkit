@@ -1,5 +1,5 @@
-id: W-007
-slug: 007-public-launch
+id: W-016
+slug: 016-public-launch
 title: "Public repo launch: licence, telemetry opt-out, README, wiki, community files"
 tier: M
 tier_rationale: >
@@ -26,7 +26,7 @@ paths_owned:
   - .github/ISSUE_TEMPLATE/
   - .github/PULL_REQUEST_TEMPLATE.md
   - tests/integration/telemetry.test.js
-  - docs/work/007-public-launch/
+  - docs/work/016-public-launch/
 notes: >
   Touches background.js and manifest.json in two narrow places only:
   the qt_telemetry install default, and the options_ui block. Both are

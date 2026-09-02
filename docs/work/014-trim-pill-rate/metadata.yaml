@@ -1,0 +1,19 @@
+id: W-014
+slug: 014-trim-pill-rate
+title: "Pace pill shows live Trim 4×/8×; clock stays on saved/lock rate"
+tier: S
+tier_rationale: >
+  Single-module display bug in content/pace.js pillRate(), which hid QT._trimBoost
+  by returning QT._userRate. Trim math, clockRate(), and Shorts pillText() are
+  unchanged. A failing pill-label regression in the existing browser fixture
+  closes it. Not L: no WPM/lock/trim formula change and no freeze risk.
+status: implemented
+paths_owned:
+  - content/pace.js
+  - tests/browser/ui-interactions.spec.js
+  - docs/SPEC.md
+  - docs/work/014-trim-pill-rate/
+notes: >
+  W-013 also lists docs/SPEC.md but is implemented_pending_live_acceptance, not
+  an in-progress concurrent writer. This item only appends the 2026-08-26 trim
+  pill supersession and the matching §4 bullets.

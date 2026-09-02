@@ -1,5 +1,5 @@
-id: W-009
-slug: 009-icon-rebuild
+id: W-018
+slug: 018-icon-rebuild
 title: "Rebuild the card icon from vector; add a check that rejects a hand-edited PNG"
 tier: M
 tier_rationale: >
@@ -13,7 +13,7 @@ paths_owned:
   - icons/src/
   - scripts/build-icons.mjs
   - scripts/check-icons.mjs
-  - docs/work/009-icon-rebuild/
+  - docs/work/018-icon-rebuild/
 notes: >
   Touches package.json (two scripts), .github/workflows/ci.yml (one job),
   scripts/package.sh (prune icons/src from the zip) and docs/SPEC.md §1.

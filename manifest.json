@@ -2,8 +2,8 @@
   "manifest_version": 3,
   "name": "YouTube Toolkit",
   "short_name": "yt-toolkit",
-  "version": "1.6.1",
-  "description": "YouTube Toolkit: No Distractions, constant WPM pace, dual captions and word highlight.",
+  "version": "1.6.2",
+  "description": "YouTube Toolkit: focused viewing, reading pace, speed controls and dual captions for YouTube and supported course players.",
   "permissions": ["storage", "webNavigation"],
   "host_permissions": [
     "https://www.youtube.com/*",
@@ -23,6 +23,8 @@
     {
       "matches": ["https://www.youtube.com/*"],
       "js": [
+        "lib/ext.js",
+        "lib/prefs.js",
         "lib/timedtext.js",
         "lib/wpm.js",
         "lib/clock.js",
@@ -36,8 +38,28 @@
       "run_at": "document_idle"
     },
     {
+      "matches": ["https://tvweb3.unip.br/*"],
+      "js": ["content/videojs-main.js"],
+      "world": "MAIN",
+      "all_frames": true,
+      "run_at": "document_start"
+    },
+    {
+      "matches": ["https://tvweb3.unip.br/*"],
+      "js": [
+        "lib/ext.js",
+        "lib/prefs.js",
+        "lib/clock.js",
+        "lib/videojs.js",
+        "content/videojs.js"
+      ],
+      "css": ["styles-videojs.css"],
+      "all_frames": true,
+      "run_at": "document_start"
+    },
+    {
       "matches": ["https://yt-search-bar.web.app/*"],
-      "js": ["content_script_searchapp.js"],
+      "js": ["lib/ext.js", "content_script_searchapp.js"],
       "css": ["styles.css"],
       "run_at": "document_idle"
     }

@@ -1,0 +1,15 @@
+id: W-007
+slug: 007-dual-select
+title: "Dual second language never marks / never switches"
+tier: M
+tier_rationale: >
+  User-visible Subtitles/CC language selection (colored checks, click intercept).
+  Quality.md §3 path M — independent review of the diff.
+status: implemented
+paths_owned:
+  - content/yt-menu-patch.js
+  - docs/work/007-dual-select/
+notes: >
+  lib/dual-lang.js is consumed via globalThis.YtToolkitDual — do not edit it.
+  W-003 listed yt-menu-patch.js but is implemented; this slice owns the file.
+  Do not inject Dual/Color/Center into root settings or Auto-translate.

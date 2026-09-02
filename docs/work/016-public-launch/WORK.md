@@ -1,4 +1,4 @@
-# W-007 — public repo launch
+# W-016 — public repo launch
 
 ## Why
 

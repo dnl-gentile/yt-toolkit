@@ -13,6 +13,11 @@
   height: 40px;
   transition: background-color 0.2s ease;
   position: relative;
+  outline: none;
+  box-shadow: none;
+  -webkit-tap-highlight-color: transparent;
+  appearance: none;
+  -webkit-appearance: none;
 }
 
 /* Circular hover background - matches YouTube's notification button */
@@ -52,6 +57,18 @@ html:not([dark]) ytd-masthead:not([dark]) #quiet-mode-toggle-button:hover {
   background-color: rgba(0, 0, 0, 0.1) !important;
 }
 
+.yt-quiet-mode-button:focus,
+.yt-quiet-mode-button:focus-visible,
+.yt-quiet-mode-button:active,
+#quiet-mode-toggle-button:focus,
+#quiet-mode-toggle-button:focus-visible,
+#quiet-mode-toggle-button:active {
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
 /* Active/pressed state */
 .yt-quiet-mode-button:active {
   background-color: rgba(255, 255, 255, 0.2);
@@ -85,53 +102,83 @@ body:not([dark]) .yt-quiet-mode-button:active {
 #qt-time-ov {
   display: none !important;
 }
-.ytp-time-display.qt-time-native-hide {
+html:not(.qt-miniplayer-active) #movie_player .ytp-left-controls .ytp-time-display:not(#qt-time-pill),
+html:not(.qt-miniplayer-active) #movie_player .ytp-left-controls .ytp-time-wrapper,
+html:not(.qt-miniplayer-active) #movie_player .ytp-left-controls .ytp-time-contents,
+html:not(.qt-miniplayer-active) #movie_player .ytp-left-controls .ytp-time-current,
+html:not(.qt-miniplayer-active) #movie_player .ytp-left-controls .ytp-time-duration,
+html:not(.qt-miniplayer-active) #movie_player .ytp-left-controls .ytp-time-separator,
+html:not(.qt-miniplayer-active) .ytp-time-display.qt-time-native-hide {
   display: none !important;
   width: 0 !important;
   min-width: 0 !important;
   max-width: 0 !important;
+  height: 0 !important;
   padding: 0 !important;
   margin: 0 !important;
   border: 0 !important;
   overflow: hidden !important;
   opacity: 0 !important;
   pointer-events: none !important;
+  font-size: 0 !important;
 }
-#qt-time-pill {
+#movie_player #qt-time-pill {
   display: inline-flex !important;
   align-items: center !important;
+  justify-content: center !important;
+  align-self: center !important;
+  vertical-align: middle !important;
   flex: 0 0 auto !important;
-  height: 40px;
-  padding: 0 12px !important;
-  margin: 0 0 0 4px !important;
-  border-radius: 20px !important;
-  background: rgba(15, 15, 15, 0.75) !important;
+  height: var(--qt-native-pill-height, 40px) !important;
+  min-height: var(--qt-native-pill-height, 40px) !important;
+  max-height: var(--qt-native-pill-height, 40px) !important;
+  padding: 0 14px !important;
+  margin: 0 var(--qt-time-pill-gap, 8px) !important;
+  border-radius: var(--qt-native-pill-border-radius, 28px) !important;
+  border-top: var(--qt-native-pill-border-top, 0 none transparent) !important;
+  border-right: var(--qt-native-pill-border-right, 0 none transparent) !important;
+  border-bottom: var(--qt-native-pill-border-bottom, 0 none transparent) !important;
+  border-left: var(--qt-native-pill-border-left, 0 none transparent) !important;
+  background-color: var(--qt-native-pill-background-color, rgba(0, 0, 0, 0.3)) !important;
+  background-image: var(--qt-native-pill-background-image, none) !important;
+  box-shadow: var(--qt-native-pill-box-shadow, none) !important;
+  backdrop-filter: var(--qt-native-pill-backdrop-filter, none) !important;
+  -webkit-backdrop-filter: var(--qt-native-pill-webkit-backdrop-filter, none) !important;
   color: #fff !important;
   font-size: 13px !important;
   font-family: Roboto, Arial, sans-serif !important;
   font-variant-numeric: tabular-nums;
   white-space: nowrap !important;
   box-sizing: border-box !important;
-  line-height: 40px;
-  overflow: visible !important;
+  line-height: 1 !important;
+  overflow: hidden !important;
   width: auto !important;
   max-width: none !important;
+  opacity: 1 !important;
+  position: static !important;
+  top: auto !important;
+  pointer-events: none !important;
+}
+#movie_player #qt-time-pill .qt-orig-time {
+  line-height: 1 !important;
 }
 
 .html5-video-player.qt-ours-on .ytp-caption-window-container,
 .html5-video-player.qt-ours-on .caption-window,
-.html5-video-player.qt-ours-on .ytp-caption-window-bottom {
+.html5-video-player.qt-ours-on .ytp-caption-window-bottom,
+.html5-video-player.qt-hide-native-cc .ytp-caption-window-container,
+.html5-video-player.qt-hide-native-cc .caption-window,
+.html5-video-player.qt-hide-native-cc .ytp-caption-window-bottom {
   opacity: 0 !important;
   pointer-events: none !important;
 }
 
+/* Dual/Color/Center: inherit YouTube's .ytp-menuitem display (table-row).
+   display:flex on the row leaks into the panel table and squeezes language names. */
 .ytp-popup.ytp-settings-menu .ytp-menuitem.qt-cap-toggle,
-.ytp-settings-menu .ytp-menuitem.qt-cap-toggle {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  width: 100% !important;
-  max-width: none !important;
+.ytp-settings-menu .ytp-menuitem.qt-cap-toggle,
+.ytp-menuitem.qt-cap-toggle {
+  text-align: left !important;
   box-sizing: border-box !important;
   border-radius: 0 !important;
   outline: none !important;
@@ -146,13 +193,14 @@ body:not([dark]) .yt-quiet-mode-button:active {
   background: rgba(255, 255, 255, 0.1) !important;
   border-radius: 0 !important;
 }
-.ytp-menuitem.qt-cap-toggle,
 .ytp-menuitem.qt-cap-toggle:focus,
 .ytp-menuitem.qt-cap-toggle:focus-visible,
 .ytp-menuitem.qt-cap-toggle:focus-within,
 .qt-switch,
 .qt-switch:focus,
 .qt-switch:focus-visible,
+#qt-speed-menu .qt-switch:focus,
+#qt-speed-menu .qt-switch:focus-visible,
 #qt-speed-menu:focus,
 #qt-speed-menu:focus-visible {
   outline: none !important;
@@ -162,17 +210,7 @@ body:not([dark]) .yt-quiet-mode-button:active {
   -webkit-tap-highlight-color: transparent;
 }
 .ytp-menuitem.qt-cap-toggle .ytp-menuitem-label {
-  white-space: nowrap !important;
   text-align: left !important;
-  flex: 1 1 auto !important;
-  justify-content: flex-start !important;
-}
-.ytp-menuitem.qt-cap-toggle .ytp-menuitem-content {
-  flex: 0 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  margin-left: auto;
 }
 .ytp-menuitem.qt-cap-toggle *:focus,
 .ytp-menuitem.qt-cap-toggle *:focus-visible {
@@ -320,8 +358,25 @@ ytd-toggle-button-renderer button:focus-visible,
   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5) !important;
 }
 
-/* Let YouTube's natural layout handle metadata sizing when sidebar is hidden */
-/* The expandPrimaryColumn() function already handles proper expansion */
+/* Watch page: fill the hole left by hidden related/comments. */
+ytd-watch-flexy.qt-nd-on:not(.qt-nd-panel) {
+  --ytd-watch-flexy-sidebar-width: 0px !important;
+  --ytd-watch-flexy-sidebar-min-width: 0px !important;
+}
+ytd-watch-flexy.qt-nd-on:not(.qt-nd-panel) #columns.ytd-watch-flexy,
+ytd-watch-flexy.qt-nd-on:not(.qt-nd-panel) #primary.ytd-watch-flexy,
+ytd-watch-flexy.qt-nd-on:not(.qt-nd-panel) #primary-inner,
+ytd-watch-flexy.qt-nd-on:not(.qt-nd-panel) #below,
+ytd-watch-flexy.qt-nd-on:not(.qt-nd-panel) ytd-watch-metadata,
+ytd-watch-flexy.qt-nd-on:not(.qt-nd-panel) #bottom-row {
+  width: 100% !important;
+  max-width: 100% !important;
+  flex-grow: 1 !important;
+}
+ytd-watch-flexy.qt-nd-on:not(.qt-nd-panel) #columns.ytd-watch-flexy {
+  gap: 0 !important;
+  column-gap: 0 !important;
+}
 
 /* Ensure search autocomplete dropdown is always visible */
 /* These are the suggestions that appear when typing in the search box */
@@ -361,33 +416,120 @@ ytd-searchbox-spt ytd-searchbox-renderer #suggestions ytd-simplebox-renderer ytd
 .qt-cluster-wrap {
   position: absolute;
   top: 12px;
-  right: 12px;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: auto;
+  max-height: 48px;
+  transform: none;
   z-index: 60;
-  width: max-content;
-  height: max-content;
-  pointer-events: auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  box-sizing: border-box;
+  pointer-events: none;
   transition: opacity 0.2s;
+}
+.qt-cluster-wrap .qt-chrome-cluster {
+  pointer-events: auto;
 }
 .qt-cluster-wrap.qt-hidden {
   opacity: 0;
   pointer-events: none;
+}
+.qt-cluster-wrap.qt-hidden .qt-chrome-cluster {
+  pointer-events: none !important;
+}
+/* A Shorts lane can collapse below one native-height control while volume is
+   expanded. Opacity/inert alone prevents interaction, but leaving the flex
+   child laid out still puts an invisible 48px box across YouTube's volume
+   surface. Remove that box entirely until the recognized lane is usable. */
+.qt-cluster-wrap.qt-short-lane.qt-hidden .qt-chrome-cluster {
+  display: none !important;
+}
+.qt-cluster-wrap.qt-short-lane {
+  align-items: center;
+  overflow: visible;
+}
+.qt-cluster-wrap.qt-short-lane .qt-chrome-cluster {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  padding: 2px 6px 2px 10px;
+}
+.qt-cluster-wrap.qt-short-lane .qt-cluster-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0 4px 0 0;
+}
+.qt-cluster-label-compact {
+  position: absolute;
+  visibility: hidden;
+  pointer-events: none;
+}
+.qt-cluster-wrap.qt-short-lane-compact .qt-cluster-label {
+  position: relative;
+}
+.qt-cluster-wrap.qt-short-lane-compact .qt-cluster-label-full {
+  position: absolute;
+  visibility: hidden;
+  pointer-events: none;
+}
+.qt-cluster-wrap.qt-short-lane-compact .qt-cluster-label-compact {
+  position: static;
+  visibility: visible;
+  pointer-events: auto;
+}
+.qt-cluster-wrap.qt-short-lane-tight .qt-chrome-cluster {
+  flex: 0 0 var(--qt-native-pill-height, 48px);
+  width: var(--qt-native-pill-height, 48px);
+  min-width: var(--qt-native-pill-height, 48px);
+  max-width: var(--qt-native-pill-height, 48px);
+  height: 100%;
+  max-height: 100%;
+  padding: max(0px, calc((var(--qt-native-pill-height, 48px) - 36px) / 2));
+  justify-content: center;
+  border-radius: 999px;
+}
+.qt-cluster-wrap.qt-short-lane-tight .qt-cluster-label {
+  position: absolute;
+  visibility: hidden;
+  pointer-events: none;
+}
+ytd-miniplayer #qt-cluster,
+ytd-miniplayer #qt-speed-menu,
+ytd-miniplayer #qt-time-pill,
+.html5-video-player.ytp-miniplayer-mode #qt-cluster,
+.html5-video-player.ytp-player-minimized #qt-cluster,
+.html5-video-player.ytp-miniplayer-mode #qt-speed-menu,
+.html5-video-player.ytp-player-minimized #qt-speed-menu,
+.html5-video-player.ytp-miniplayer-mode #qt-time-pill,
+.html5-video-player.ytp-player-minimized #qt-time-pill {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 .qt-chrome-cluster {
   display: flex !important;
   flex-direction: row !important;
   align-items: center;
   box-sizing: border-box;
-  height: 40px;
+  height: var(--qt-native-pill-height, 40px);
   width: max-content;
   padding: 2px 2px 2px 14px;
   gap: 0;
   overflow: hidden;
-  background: rgba(15, 15, 15, 0.75);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  border: 0;
-  box-shadow: none;
-  border-radius: 999px;
+  background-color: var(--qt-native-pill-background-color, rgba(0, 0, 0, 0.3));
+  background-image: var(--qt-native-pill-background-image, none);
+  backdrop-filter: var(--qt-native-pill-backdrop-filter, none);
+  -webkit-backdrop-filter: var(--qt-native-pill-webkit-backdrop-filter, none);
+  border-top: var(--qt-native-pill-border-top, 0 none transparent);
+  border-right: var(--qt-native-pill-border-right, 0 none transparent);
+  border-bottom: var(--qt-native-pill-border-bottom, 0 none transparent);
+  border-left: var(--qt-native-pill-border-left, 0 none transparent);
+  box-shadow: var(--qt-native-pill-box-shadow, none);
+  border-radius: var(--qt-native-pill-border-radius, 28px);
   color: #fff;
   font-family: Roboto, Arial, sans-serif;
 }
@@ -451,21 +593,45 @@ ytd-searchbox-spt ytd-searchbox-renderer #suggestions ytd-simplebox-renderer ytd
 .qt-menu,
 #qt-speed-menu {
   position: absolute;
-  top: 68px;
-  right: 12px;
+  top: 60px;
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
   z-index: 70;
-  width: 340px;
-  background: rgba(15, 15, 15, 0.82);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  border: 0;
+  width: min(340px, calc(100% - 16px));
+  box-sizing: border-box;
+  background-color: var(--qt-native-menu-background-color, rgba(28, 28, 28, 0.9));
+  background-image: var(--qt-native-menu-background-image, none);
+  background-blend-mode: var(--qt-native-menu-background-blend-mode, normal);
+  backdrop-filter: var(--qt-native-menu-backdrop-filter, none);
+  -webkit-backdrop-filter: var(--qt-native-menu-webkit-backdrop-filter, none);
+  border-top: var(--qt-native-menu-border-top, 0 none transparent);
+  border-right: var(--qt-native-menu-border-right, 0 none transparent);
+  border-bottom: var(--qt-native-menu-border-bottom, 0 none transparent);
+  border-left: var(--qt-native-menu-border-left, 0 none transparent);
   outline: none;
-  box-shadow: none;
-  border-radius: 12px;
+  box-shadow: var(--qt-native-menu-box-shadow, none);
+  border-radius: var(--qt-native-menu-border-radius, 12px);
+  text-shadow: var(--qt-native-menu-text-shadow, 0 0 2px rgba(0, 0, 0, 0.5));
   color: #fff;
   font-family: Roboto, Arial, sans-serif;
   overflow: hidden;
   padding: 8px 0 12px;
+}
+.html5-video-player.ytp-delhi-modern #qt-speed-menu {
+  background-color: var(
+    --qt-native-menu-background-color,
+    var(--yt-sys-color-baseline--overlay-background-medium, rgba(0, 0, 0, 0.6))
+  );
+  backdrop-filter: var(
+    --qt-native-menu-backdrop-filter,
+    var(--yt-frosted-glass-backdrop-filter-override, blur(16px))
+  );
+  -webkit-backdrop-filter: var(
+    --qt-native-menu-webkit-backdrop-filter,
+    var(--yt-frosted-glass-backdrop-filter-override, blur(16px))
+  );
+  text-shadow: var(--qt-native-menu-text-shadow, none);
 }
 .qt-menu-head {
   display: flex;
@@ -559,44 +725,55 @@ ytd-searchbox-spt ytd-searchbox-renderer #suggestions ytd-simplebox-renderer ytd
 .qt-row:hover { background: rgb(255 255 255 / 0.08); }
 .qt-row-ico { width: 24px; color: #fff; }
 .qt-row-label { flex: 1; font-size: 14px; }
-.qt-switch,
-.ytp-menuitem-toggle-checkbox.qt-switch {
+.qt-switch {
   display: inline-block;
-  width: 36px;
-  height: 14px;
+  width: 40px;
+  height: 24px;
   border: 0 !important;
   outline: none !important;
   padding: 0;
   margin: 0;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  background: var(
+    --yt-sys-color-baseline--overlay-background-medium-light,
+    rgba(0, 0, 0, 0.3)
+  );
   position: relative;
   cursor: pointer;
   flex-shrink: 0;
   -webkit-tap-highlight-color: transparent;
   box-shadow: none !important;
+  box-sizing: border-box;
+}
+.qt-switch::before {
+  content: none;
+  display: none;
 }
 .qt-switch::after {
   content: "";
   position: absolute;
-  top: -3px;
-  left: -3px;
+  top: 2px;
+  left: 2px;
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #f1f1f1;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-  transition: transform 0.1s, background-color 0.1s;
+  background: var(
+    --yt-sys-color-baseline--overlay-text-secondary,
+    rgba(255, 255, 255, 0.7)
+  );
+  box-shadow: none;
   transform: none;
 }
-.qt-switch.on,
-.ytp-menuitem[aria-checked="true"] .qt-switch {
-  background: rgba(255, 255, 255, 0.42);
+.qt-switch.on {
+  background: var(
+    --yt-sys-color-baseline--overlay-button-primary,
+    rgba(255, 255, 255, 0.3)
+  );
 }
-.qt-switch.on::after,
-.ytp-menuitem[aria-checked="true"] .qt-switch::after {
-  background: #f1f1f1;
-  transform: translateX(22px);
+.qt-switch.on::after {
+  background: #ffffff;
+  left: 18px;
+  transform: none;
 }
 .qt-kicker {
   margin: 0;
@@ -627,7 +804,7 @@ ytd-searchbox-spt ytd-searchbox-renderer #suggestions ytd-simplebox-renderer ytd
   font-weight: 400;
 }
 .qt-cap-p { bottom: 72px; }
-.qt-cap-s { bottom: 118px; }
+.qt-cap-s { bottom: 136px; }
 .qt-caption {
   display: inline-block;
   font-family: inherit;
@@ -643,12 +820,7 @@ ytd-searchbox-spt ytd-searchbox-renderer #suggestions ytd-simplebox-renderer ytd
   padding: 3px 10px;
 }
 .qt-dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  margin-right: 6px;
-  vertical-align: middle;
+  display: none !important;
 }
 .qt-cap-line.qt-rsvp {
   left: 50% !important;
@@ -713,3 +885,17 @@ ytd-searchbox-spt ytd-searchbox-renderer #suggestions ytd-simplebox-renderer ytd
   line-height: 1;
 }
 .qt-orp { color: inherit; }
+
+/* No original-language ASR: rhythm-dependent controls read as unavailable
+   but keep their saved state. Matches YouTube's own disabled menu items
+   (dimmed label, no hover surface, default cursor). */
+.qt-row-disabled {
+  opacity: 0.38;
+  cursor: default;
+}
+.qt-row-disabled:hover {
+  background: transparent;
+}
+.qt-switch-disabled {
+  cursor: default;
+}

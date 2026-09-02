@@ -161,3 +161,7 @@ EVIDENCE records that logo < 2 s, avatar, and In this video were not run.
 5. Live (or recorded) logo < 2 s and In this video opens, as already required by SPEC §8–10 and QUALITY §2.
 
 Until then this slice stays **implemented**, not **tests green**, not **real-host verified**.
+
+## Remediation (2026-08-20)
+
+Code + `EVIDENCE.md` updated for HIGH findings 1, 3, 4, 8 (and finding 3’s empty-`detail.url` home case). `grep -n "subtree:"` is now in evidence and would fail if `#comments`/`#below`/`#secondary` regained `subtree: true`. This note does not change the verdict above; a later review still owns PASS.

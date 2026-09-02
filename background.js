@@ -27,24 +27,39 @@ const analytics = new Analytics('G-Y6EVNLSKLJ', 'JuFahXeVR0anCWYMk94y4g');
 
 // Set the default state on installation
 chrome.runtime.onInstalled.addListener((details) => {
-  chrome.storage.sync.set({
+  const defaults = {
     noDistractionsEnabled: true,
     qt_targetWpm: 180,
     qt_paceLock: true,
     qt_trimSilence: true,
+    qt_playbackRate: 1,
+    qt_fixed1x: false,
     qt_overlayMode: "both",
     qt_wordHighlight: true,
     qt_centerWord: false,
     qt_dualCaptions: false,
     qt_captionBg: true,
+    qt_captionLangs: [],
+    qt_primaryTrack: "",
+    qt_secondaryTrack: "",
+    qt_vjs_dualCaptions: false,
+    qt_vjs_primaryTrack: "",
+    qt_vjs_secondaryTrack: "",
+    qt_vjs_slotsChosen: false,
+    qt_captionsEnabled: null,
     qt_telemetry: true,
+  };
+  chrome.storage.sync.get(Object.keys(defaults), (s) => {
+    const patch = {};
+    for (const k of Object.keys(defaults)) {
+      if (s[k] === undefined) patch[k] = defaults[k];
+    }
+    if (Object.keys(patch).length) {
+      chrome.storage.sync.set(patch);
+      chrome.storage.local.set(patch);
+    }
   });
-  console.log("YouTube Toolkit installed.");
-  
-  // Track installation
-  if (details.reason === 'install') {
-    analytics.trackInstall();
-  }
+  if (details.reason === "install") analytics.trackInstall();
 });
 
 // Listen for navigation events to 'youtube.com'
@@ -126,7 +141,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       // Track toggle event
       analytics.trackToggle(newState);
 
-      // Save the new state
+      /* Write BOTH areas, because lib/prefs.js resolves reads as
+         Object.assign({}, sync, local) — local wins — and the install defaults
+         above seed noDistractionsEnabled into local too. A sync-only write is
+         therefore invisible: the stale value left in local outranks it on the
+         next page load and the setting turns itself back on. */
+      chrome.storage.local.set({ noDistractionsEnabled: newState });
       chrome.storage.sync.set({ noDistractionsEnabled: newState }, () => {
         
         // Check if we're on a video page

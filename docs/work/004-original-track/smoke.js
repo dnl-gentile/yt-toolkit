@@ -35,7 +35,13 @@ const windowObj = {
   fetch(url) {
     const u = String(url);
     fetches.push(u);
-    const body = /lang=zh/.test(u) && !/tlang=/.test(u) ? zhJson3 : json3;
+    const needsProof = /tlang=pt/.test(u);
+    const body =
+      needsProof && !/[?&]pot=TOKEN/.test(u)
+        ? ""
+        : /lang=zh/.test(u) && !/tlang=/.test(u)
+          ? zhJson3
+          : json3;
     return Promise.resolve({
       text: async () => body,
       clone() {
@@ -49,6 +55,13 @@ const windowObj = {
     captions: {
       playerCaptionsTracklistRenderer: {
         captionTracks: [
+          {
+            baseUrl: "https://www.youtube.com/api/timedtext?v=VIDEO1&lang=en",
+            languageCode: "en",
+            name: { simpleText: "English" },
+            kind: "",
+            vssId: ".en",
+          },
           {
             baseUrl: "https://www.youtube.com/api/timedtext?v=VIDEO1&lang=en&kind=asr",
             languageCode: "en",
@@ -108,7 +121,11 @@ function tick() {
 
   const tracks = posts.filter((p) => p.type === "QT_TRACKS");
   assert.ok(tracks.length >= 1, "posted QT_TRACKS");
-  assert.equal(tracks[0].tracks[0].kind, "asr");
+  assert.equal(tracks[0].tracks[0].kind, "", "uploaded listed first");
+  assert.ok(
+    tracks[0].tracks.some((t) => t.kind === "asr"),
+    "ASR track present",
+  );
 
   const origPosts = timed().filter((p) => p.original === true);
   assert.ok(origPosts.length >= 1, "posted original:true");
@@ -116,8 +133,35 @@ function tick() {
   assert.equal(/tlang=/.test(origPosts[0].url), false, "original url has no tlang");
   assert.equal(/fmt=json3/.test(origPosts[0].url), true, "original url is json3");
   assert.ok(
+    /kind=asr/.test(origPosts[0].url) || /caps=asr/.test(origPosts[0].url),
+    "original payload is ASR, not uploaded",
+  );
+  assert.ok(
     fetches.some((u) => /lang=en/.test(u) && /kind=asr/.test(u) && !/tlang=/.test(u)),
     "fetched original asr without tlang",
+  );
+
+  const nUp = posts.length;
+  await windowObj.fetch(
+    "https://www.youtube.com/api/timedtext?v=VIDEO1&lang=en&fmt=json3",
+  );
+  await tick();
+  const uploaded = posts.slice(nUp).filter((p) => p.type === "QT_TIMEDTEXT");
+  assert.ok(uploaded.length >= 1, "posted uploaded en");
+  assert.ok(
+    uploaded.every((p) => p.original === false),
+    "uploaded same-lang is original:false when ASR exists",
+  );
+
+  const nCaps = posts.length;
+  await windowObj.fetch(
+    "https://www.youtube.com/api/timedtext?v=VIDEO1&lang=en&fmt=json3&caps=asr",
+  );
+  await tick();
+  const capsOrig = posts.slice(nCaps).filter((p) => p.type === "QT_TIMEDTEXT");
+  assert.ok(
+    capsOrig.some((p) => p.original === true),
+    "player URL with caps=asr (no kind) is original",
   );
 
   const before = timed().filter((p) => p.original === true).length;
@@ -163,6 +207,10 @@ function tick() {
   assert.equal(firstTimed.original, true, "re-posted original first");
   assert.equal(firstTimed.lang, "en");
 
+  await windowObj.fetch(
+    "https://www.youtube.com/api/timedtext?v=VIDEO1&lang=en&kind=asr&pot=TOKEN&signature=NATIVE",
+  );
+  await tick();
   const n2 = posts.length;
   (listeners.message || []).forEach((fn) =>
     fn({
@@ -170,7 +218,7 @@ function tick() {
       data: {
         source: "quiettube-iso",
         type: "QT_FETCH_TRACK",
-        url: "https://www.youtube.com/api/timedtext?v=VIDEO1&lang=en&tlang=pt&fmt=json3",
+        url: "https://www.youtube.com/api/timedtext?v=VIDEO1&lang=en&tlang=pt&fmt=json3&signature=TRANSLATION",
         lang: "tlang:pt",
       },
     }),
@@ -186,6 +234,19 @@ function tick() {
     dual.filter((p) => p.original === true && String(p.lang).includes("pt")).length,
     0,
     "translation must not be original:true",
+  );
+  const translatedFetch = fetches.find(
+    (u) => /tlang=pt/.test(u) && /[?&]pot=TOKEN/.test(u),
+  );
+  assert.ok(translatedFetch, "translation fetch copied pot from player request");
+  assert.ok(
+    /signature=TRANSLATION/.test(translatedFetch),
+    "translation kept its own signature",
+  );
+  assert.equal(
+    /signature=NATIVE/.test(translatedFetch),
+    false,
+    "native signature did not leak tracks",
   );
 
   console.log("PASS: original ASR posted original:true lang=en no tlang");

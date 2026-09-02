@@ -11,9 +11,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Pure logic. No browser, no network — so it costs nothing to prove it on both
+  # operating systems the extension is actually used on.
   unit:
-    name: unit / smoke
-    runs-on: ubuntu-latest
+    name: unit / smoke (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -22,12 +28,61 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
-      - run: node --check content/pace.js content/inject.js content/captions.js content/yt-menu-patch.js content_script_youtube.js lib/timedtext.js lib/wpm.js lib/clock.js lib/dual-lang.js
+      - name: Syntax-check every runtime file
+        shell: bash
+        run: |
+          for file in background.js content/*.js content_script_*.js lib/*.js; do
+            node --check "$file"
+          done
       - run: node docs/work/004-original-track/smoke.js
       - run: node docs/work/006-toggle-paint/check.mjs
+      - run: node docs/work/008-captions-overlay/check.mjs
 
+  # The browser suite is hermetic: every page is served by Playwright route
+  # interception from http://yt.test, never from the real YouTube. That is what
+  # makes a Windows run meaningful here rather than a coin flip against a live
+  # host — a failure on one OS and not the other is a real platform difference,
+  # not YouTube serving something else that minute.
   integration:
-    name: integration
+    name: integration (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - name: Install Chromium
+        shell: bash
+        run: |
+          # --with-deps installs Linux system packages; it is a no-op-with-error
+          # on Windows, where the runner already has what Chromium needs.
+          if [ "$RUNNER_OS" = "Linux" ]; then
+            npx playwright install --with-deps chromium
+          else
+            npx playwright install chromium
+          fi
+      - run: npm run test:integration
+      - name: Upload traces on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces-${{ matrix.os }}
+          path: output/playwright
+          if-no-files-found: ignore
+          retention-days: 7
+
+  # Pixel comparison, so it is pinned to one OS on purpose. Baselines are
+  # rasterised artefacts: the same CSS renders differently on Linux and macOS
+  # (font hinting, antialiasing), and a shared baseline would just make this job
+  # fail wherever it was not generated. Linux is the one CI blesses.
+  visual:
+    name: visual baselines
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -36,7 +91,16 @@ jobs:
           node-version: "22"
           cache: npm
       - run: npm ci
-      - run: npm run test:integration
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:visual
+      - name: Upload the diff when a snapshot moves
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-diff
+          path: output/playwright
+          if-no-files-found: ignore
+          retention-days: 7
 
   icons:
     name: icons
@@ -52,18 +116,3 @@ jobs:
       # Fails if a PNG was hand-edited, is stale against icons/src/icon.svg,
       # or renders a glyph too small to read at 16px.
       - run: npm run icons:check
-
-  visual:
-    name: visual baselines
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: npm
-      - run: npm ci
-      - run: npx playwright install --with-deps chromium
-      - run: npm run test:visual
-        continue-on-error: false

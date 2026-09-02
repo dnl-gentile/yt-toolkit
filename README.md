@@ -44,8 +44,8 @@ into docs/media/, then replace this comment with the table from that file.
 - **Live WPM readout** in a top-center pill on the player: `180 WPM · 1.75x`. Unlocked,
   the WPM is the *measured* local speaking rate. Pause in a silence and it reads `0` —
   it does not hold a stale number.
-- **Pace lock** turns the speedometer into a target: 120–600 WPM, step 10, presets at
-  120 · 180 · 250 · 400 · 600. The extension solves for the rate:
+- **Pace lock** turns the speedometer into a target: 120–800 WPM, step 10, with presets at
+  120 · 180 · 250 · 400 · 600 and the slider reaching 800. The extension solves for the rate:
   `playbackRate = clamp(targetWpm / localWpm, 0.7, 2.5)`.
 - **Trim silence** accelerates gaps of 1.2 s or longer (4×, or 8× past five seconds) and
   snaps back to your lock *on the first spoken word* — no seeking, so no decoder stutter.
@@ -53,7 +53,12 @@ into docs/media/, then replace this comment with the table from that file.
   `{adjusted current} / {adjusted total} ({original total})`. Stable, not a flickering
   live estimate.
 - Measured from the video's **original-language** track, so switching the displayed
-  subtitle to Arabic or Japanese never distorts the pace.
+  subtitle to Arabic or Japanese never distorts the pace — and it reads that track even when
+  captions are switched off, so you never have to turn CC on to make the pace work.
+- **Your settings follow you to the next video.** Pace lock target and state, trim, manual
+  speed, caption languages and the Dual/Highlight/Center toggles all persist.
+- **Shorts** get the pace pill and, in their captions menu, Color highlight and Center word.
+  Dual is deliberately absent there — one line is all a Short has room for.
 
 ### Captions
 
@@ -104,6 +109,13 @@ Manifest V3 extension. Firefox is not supported.
 |---|---|---|
 | <kbd>Shift</kbd> + <kbd>,</kbd> | −0.25× | −10 WPM |
 | <kbd>Shift</kbd> + <kbd>.</kbd> | +0.25× | +10 WPM |
+| <kbd>S</kbd> / <kbd>D</kbd> | −0.25× / +0.25× | −0.25× / +0.25× |
+| <kbd>A</kbd> or <kbd>Shift</kbd> + <kbd>`</kbd> | \- | \- |
+
+<kbd>A</kbd> (and <kbd>Shift</kbd>+<kbd>`</kbd>) drops everything to a plain **1×** and back.
+That 1× is a *global* state, not a per-video one: set it, open a different video tomorrow, and
+you are still at 1× until you leave it. Your pace lock target and trim setting are remembered
+underneath, untouched, waiting for you to come back.
 
 Everything else stays YouTube's: <kbd>J</kbd> / <kbd>K</kbd> / <kbd>L</kbd>,
 <kbd>,</kbd> / <kbd>.</kbd> frame-stepping, <kbd>Shift</kbd>+<kbd>P</kbd> /

@@ -1,0 +1,19 @@
+id: W-015
+slug: 015-weighted-pace
+title: "Weight Pace Lock by fixed orthographic speech load"
+tier: L
+tier_rationale: >
+  Changes WPM and Pace Lock math. Requires failing regressions first,
+  slow-speech mutation evidence, independent refutation review, full unit
+  suite, and real-host acceptance before the behavior is called done.
+status: implemented_pending_live_acceptance
+paths_owned:
+  - lib/wpm.js
+  - content/pace.js
+  - tests/wpm.test.js
+  - docs/SPEC.md
+  - docs/work/001-wpm-engine/metadata.yaml
+  - docs/work/015-weighted-pace/
+notes: >
+  W-001 is historical and was marked implemented to release its stale path
+  ownership. The deliberately dirty repository must not be reset or cleaned.
