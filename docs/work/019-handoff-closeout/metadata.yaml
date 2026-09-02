@@ -1,0 +1,32 @@
+id: W-019
+slug: 019-handoff-closeout
+title: "Close out the Codex handoff: reconcile, audit, fix, and make the docs match the code"
+tier: L
+tier_rationale: >
+  Touches ASR acquisition (content/inject.js), the player-lifecycle observers
+  that govern freeze risk (content/captions.js, content/yt-menu-patch.js), and
+  the storage contract behind No Distractions. QUALITY.md §3 puts any of those
+  at L on its own. Each change landed failing-test-first and mutation-checked.
+status: implemented
+supersedes:
+  - W-011
+paths_owned:
+  - background.js
+  - content/inject.js
+  - content/captions.js
+  - content/yt-menu-patch.js
+  - PRIVACY.md
+  - CHANGELOG.md
+  - docs/SPEC.md
+  - .github/workflows/ci.yml
+  - tests/integration/nd-persistence.test.js
+  - tests/integration/privacy-accuracy.test.js
+  - tests/browser/no-asr-mode.spec.js
+  - tests/browser/menu-flicker.spec.js
+  - tests/live/probe.spec.js
+  - docs/work/008-captions-overlay/check.mjs
+  - docs/work/019-handoff-closeout/
+notes: >
+  Renumbered 007/008/009-public-launch/searchapp-marker/icon-rebuild to
+  016/017/018: both development lines had independently used 007-009, and the
+  release-line items were the ones that carried no cross-references.

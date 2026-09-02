@@ -91,8 +91,23 @@ result is used in your browser and transmitted nowhere.
 | `youtube.com` | The product runs there |
 | `yt-search-bar.web.app` | Show the toggle on the quiet page |
 | `google-analytics.com` | Send the events above |
+| `tvweb3.unip.br` | Playback controls on that one allow-listed course player |
 
-No `history`, no `cookies`, no `webRequest`, no access to other sites.
+No `history`, no `cookies`, no `webRequest`, and no access to any site other than the four
+above.
+
+### The course player
+
+The extension runs a small playback adapter on `tvweb3.unip.br` and nothing else runs there —
+no No Distractions, no caption fetching, **no telemetry**, and no network request of any kind.
+
+Besides its own settings it touches two keys in that site's own `localStorage`,
+`videoPlaybackSpeed` and `idioma`, which are how the site already remembers your speed and
+subtitle language for itself. Keeping them in step is what stops the page fighting the
+extension on the next video. Nothing else on the page is read.
+
+Full detail is in
+[PRIVACY.md](https://github.com/dnl-gentile/yt-toolkit/blob/main/PRIVACY.md).
 
 ## Verifying any of this
 

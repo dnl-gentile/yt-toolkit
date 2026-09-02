@@ -42,8 +42,13 @@ Work down the list. Most reports resolve in the first section.
 
 ## Pace lock is on but the speed does not change
 
-- The rate is clamped to **0.7×–2.5×**. If the speaker is already near your target, the
-  correct rate is near 1× and nothing visibly happens.
+- **Check fixed 1× first.** If you pressed <kbd>A</kbd> (or <kbd>Shift</kbd>+<kbd>`</kbd>) at
+  some point, everything is pinned to plain 1× and Pace lock is deliberately not driving the
+  rate. That state is **global and persistent** — it survives the video ending, navigating
+  away, and closing the browser — so it is easy to turn on, forget, and then wonder why the
+  pace engine looks broken days later. The pill shows `1x`. Press the same key to leave it.
+- The rate is clamped to **0.7×–4×**. If the speaker is already near your target, the correct
+  rate is near 1× and nothing visibly happens.
 - Rate changes ease in at ±0.05× per tick during speech. Give it a few seconds; it does
   not jump.
 - Check whether another extension is also writing `playbackRate`. Two controllers fighting

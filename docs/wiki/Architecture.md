@@ -95,7 +95,7 @@ Trim uses its own 1.2 s floor.
 median is what the clock and the initial lock use; the live local rate is what the pill
 shows when unlocked.
 
-**Lock:** `clamp(targetWpm / localWpm, 0.7, 2.5)`, eased ±0.05× per tick during speech,
+**Lock:** `clamp(targetWpm / localWpm, 0.7, 4)`, eased ±0.05× per tick during speech,
 but **snapped** — not eased — when returning from a trim boost.
 
 **Trim:** accelerate gaps ≥ 1.2 s to 4×, or 8× past 5 s. Never seek. Never write a

@@ -72,14 +72,23 @@ Your settings live in Chrome's own storage and stay there. `chrome.storage.sync`
 Chrome may sync them to your other signed-in Chrome installs — that is Chrome's sync, not
 a server of ours.
 
-| Key | Area | What it is |
-|---|---|---|
-| `noDistractionsEnabled` | sync | No Distractions on/off |
-| `qt_targetWpm`, `qt_paceLock`, `qt_trimSilence` | sync | Pace settings |
-| `qt_overlayMode`, `qt_wordHighlight`, `qt_centerWord`, `qt_dualCaptions`, `qt_captionBg` | sync | Caption and overlay settings |
-| `qt_captionPos` | sync | Where you dragged the caption lines |
-| `qt_telemetry` | sync | The privacy switch on this page |
-| `ga_client_id` | local | Installation ID, described above |
+Settings are written to **both** `chrome.storage.sync` and `chrome.storage.local`, and read
+back local-first. The complete set:
+
+| Key | What it is |
+|---|---|
+| `noDistractionsEnabled` | No Distractions on/off |
+| `qt_targetWpm`, `qt_paceLock`, `qt_trimSilence` | Pace lock target, and whether lock and trim are on |
+| `qt_playbackRate`, `qt_fixed1x` | Your manual speed, and whether the global fixed-1x state is on |
+| `qt_overlayMode`, `qt_wordHighlight`, `qt_centerWord`, `qt_dualCaptions`, `qt_captionBg` | Caption and overlay toggles |
+| `qt_captionLangs`, `qt_primaryTrack`, `qt_secondaryTrack`, `qt_displayCaption`, `qt_captionsEnabled` | Which caption languages you picked and whether captions were on |
+| `qt_captionPos` | Where you dragged the caption lines |
+| `qt_vjs_dualCaptions`, `qt_vjs_primaryTrack`, `qt_vjs_secondaryTrack`, `qt_vjs_slotsChosen` | The same caption choices, kept separately for the course player below |
+| `qt_telemetry` | The privacy switch on the options page |
+| `ga_client_id` | Installation ID (local only), described above |
+
+Every one of these is a **setting**. None of them stores what you watched, searched for, or
+read — there is no history, no video list, no transcript cache.
 
 There is no account, no login, no server of ours holding any of it. Uninstalling the
 extension removes all of it.
@@ -96,6 +105,9 @@ Caption fetches happen only on watch pages, and only for the video you are watch
 are the mechanism of the product, not analytics: the results are used in your browser and
 never transmitted anywhere.
 
+**The course player makes none.** On `tvweb3.unip.br` (below) the extension issues no network
+request at all — no `fetch`, no `XMLHttpRequest`, and no telemetry.
+
 ## Permissions, and why each one exists
 
 | Permission | Why it is needed |
@@ -105,9 +117,45 @@ never transmitted anywhere.
 | `https://www.youtube.com/*` | The whole product runs on YouTube pages |
 | `https://yt-search-bar.web.app/*` | Show the No Distractions toggle on the quiet page |
 | `https://www.google-analytics.com/*` | Send the usage events above |
+| `https://tvweb3.unip.br/*` | Playback controls on that course player — see the section below |
 
 The extension requests no `tabs` content access beyond these hosts, no `history`, no
 `cookies`, no `webRequest`, and no access to any other site.
+
+## The course player on `tvweb3.unip.br`
+
+The extension also runs on one non-YouTube host: the Video.js player used by UNIP's course
+site. This is an **allow-list of exactly one**, written literally into `manifest.json`. It is
+not a wildcard, and the extension does nothing on any other site.
+
+What runs there is a small playback adapter — the speed pill, its slider and presets, the
+adjusted watch clock, and dual subtitles built from caption tracks **the course player has
+already loaded**. What does *not* run there:
+
+- No Distractions
+- The YouTube menu patches
+- Caption acquisition of any kind — nothing is fetched, so Pace lock, Trim silence, Colour
+  highlight, Center word and WPM are all deliberately unavailable rather than guessed at
+- Telemetry
+
+It keeps six of its own settings in the extension's storage: `qt_fixed1x` and
+`qt_playbackRate` (shared with YouTube, which is how one fixed-1x state covers both), plus
+`qt_vjs_dualCaptions`, `qt_vjs_primaryTrack`, `qt_vjs_secondaryTrack` and
+`qt_vjs_slotsChosen`.
+
+It also touches **two keys in the course site's own `localStorage`**, which belong to that site
+rather than to the extension:
+
+| Key | Read or written | Why |
+|---|---|---|
+| `videoPlaybackSpeed` | written | The site's own speed memory. Kept in step so the page restores the speed you actually chose, instead of fighting the extension on the next video |
+| `idioma` | read, and written when you pick a subtitle language | The site's own subtitle-language memory, used to work out which language to show first |
+
+Both already exist on that site and are how it remembers those two choices for itself. Nothing
+else on the page is read: not course content, not your identity there, not grades or enrolment.
+
+Nothing from that host is transmitted anywhere, because that host is never contacted by us at
+all — the adapter issues no request of any kind.
 
 ## Third parties
 

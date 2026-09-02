@@ -11,6 +11,15 @@ is a
 **All three require captions to be on.** If CC is off, our overlay is off too. The
 extension never forces subtitles on to make its own features work.
 
+**Two of them need more than that.** Colour highlight and Center word have to know when each
+word is spoken, and only auto-generated tracks in the video's original language carry that
+timing. On a video with nothing but uploaded subtitles the two rows still appear, greyed out,
+with a tooltip saying why — rather than switching on and inventing a cadence the video never
+published. Dual subtitles has no such requirement: it only needs the two tracks to exist.
+
+**Shorts get two rows, not three.** Dual is deliberately absent there — a Short has room for one
+line — so the Shorts captions sheet offers Colour highlight and Center word only.
+
 ## Dual subtitles
 
 Two languages at once, stacked.
